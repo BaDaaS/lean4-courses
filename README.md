@@ -50,39 +50,43 @@ Courses are sequential. Complete them in order.
 | 0016 | Metaprogramming Intro   | Custom tactics          | Lean 4 macro system         |
 | 0017 | Projects                | Formalise a theorem     | Build a verified program    |
 
-### Part III: Systems Programming (0018-0023)
+### Part III: Systems Programming (0018-0024)
 
-| #    | Topic                  | Focus                                 |
-| ---- | ---------------------- | ------------------------------------- |
-| 0018 | IO and System Prog     | File IO, processes, environment       |
-| 0019 | Compiled Programs      | Lake projects, multi-file, executables|
-| 0020 | FFI and C Interop      | Calling C from Lean, opaque types     |
-| 0021 | Concurrency and Tasks  | Tasks, Mutex, IO.Ref, channels        |
-| 0022 | File IO and CLI        | Building real CLI tools               |
-| 0023 | Performance/Compile    | Tail recursion, Array, @[inline], FFI |
+| #    | Topic                  | Focus                                  |
+| ---- | ---------------------- | -------------------------------------- |
+| 0018 | IO and System Prog     | File IO, processes, environment        |
+| 0019 | Lakefile and Lake      | Build system, dependencies, targets    |
+| 0020 | Compiled Programs      | Lake projects, multi-file, executables |
+| 0021 | FFI and C Interop      | Calling C from Lean, opaque types      |
+| 0022 | Concurrency and Tasks  | Tasks, Mutex, IO.Ref, channels         |
+| 0023 | File IO and CLI        | Building real CLI tools                |
+| 0024 | Performance/Compile    | Tail recursion, Array, @[inline], FFI  |
 
-### Part IV: Contributing to Libraries (0024-0026)
+### Part IV: Contributing to Libraries (0025-0027)
 
 | #    | Topic                   | Focus                               |
 | ---- | ----------------------- | ----------------------------------- |
-| 0024 | Contributing to Mathlib | Conventions, PR workflow, linting   |
-| 0025 | Contributing to CSLib   | LTS, bisimulation, process algebra  |
-| 0026 | Contributing to ArkLib  | Cryptographic formalization         |
+| 0025 | Contributing to Mathlib | Conventions, PR workflow, linting   |
+| 0026 | Contributing to CSLib   | LTS, bisimulation, process algebra  |
+| 0027 | Contributing to ArkLib  | Cryptographic formalization         |
 
-### Part V: Deep Lean Expertise (0027-0030)
+### Part V: Deep Lean Expertise (0028-0031)
 
 | #    | Topic                     | Focus                              |
 | ---- | ------------------------- | ---------------------------------- |
-| 0027 | Lean Internals            | Kernel, elaborator, compiler, IR   |
-| 0028 | Elaboration/Unification   | MetaM, type inference, debugging   |
-| 0029 | Advanced Metaprogramming  | Custom tactics, elaborators, DSLs  |
-| 0030 | Type Theory Foundations   | CIC, universes, proof irrelevance  |
+| 0028 | Lean Internals            | Kernel, elaborator, compiler, IR   |
+| 0029 | Elaboration/Unification   | MetaM, type inference, debugging   |
+| 0030 | Advanced Metaprogramming  | Custom tactics, elaborators, DSLs  |
+| 0031 | Type Theory Foundations   | CIC, universes, proof irrelevance  |
 
 ## Building
 
 ```bash
 lake build
 ```
+
+This compiles all Solutions.lean files (0000-0015) and verifies they
+type-check.
 
 ## Running Exercises
 
