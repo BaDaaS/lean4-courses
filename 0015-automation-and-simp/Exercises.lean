@@ -51,3 +51,43 @@ theorem combo_ex2 (xs : List Nat) (h : xs.length > 0) :
 theorem challenge_auto (n m : Nat) (h : n > 0) (h2 : m > 0) :
     n * m > 0 := by
   sorry
+
+-- Exercise 11 (medium): Create a custom simp set and use
+-- "simp only" with your tagged lemmas.
+def triple (n : Nat) : Nat := 3 * n
+
+@[simp]
+theorem triple_eq (n : Nat) : triple n = 3 * n := rfl
+
+-- Prove this using simp only with triple_eq
+theorem triple_2 : triple 2 = 6 := by
+  sorry
+
+-- Exercise 12 (hard): Use conv to rewrite inside a nested
+-- expression. The goal has structure where you need to target
+-- a specific subterm.
+theorem conv_nested (a b : Nat) :
+    (a + 0) + (b + 0) = a + b := by
+  sorry
+
+-- Exercise 13 (hard): Combine multiple tactics. Simplify some
+-- parts, then finish with omega or ring.
+theorem combo_multi (xs : List Nat) (n : Nat) :
+    (xs ++ [n]).length = xs.length + 1 := by
+  sorry
+
+-- Exercise 14 (hard): Use conv to rewrite only the left side of
+-- an equation inside a larger expression.
+theorem conv_targeted (a b c : Nat) (h : a = b) :
+    a + c = b + c := by
+  sorry
+
+-- Exercise 15 (challenge): A proof requiring careful tactic
+-- sequencing. You need to unfold definitions, simplify specific
+-- parts, rewrite with hypotheses, and close with automation.
+def myFun (n : Nat) : Nat := n * 2 + 1
+
+theorem challenge_sequencing (a b : Nat)
+    (h : a = b + 3) :
+    myFun a = myFun b + 6 := by
+  sorry

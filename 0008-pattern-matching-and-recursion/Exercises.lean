@@ -42,3 +42,35 @@ def depth : Tree alpha -> Nat := sorry
 def merge (xs ys : List Nat) : List Nat := sorry
 
 def mergeSort (xs : List Nat) : List Nat := sorry
+
+-- ============================================================
+-- Additional Exercises
+-- ============================================================
+
+-- Exercise 11 (medium): Implement partition
+-- Split a list into two: elements satisfying the predicate, and
+-- elements that do not.
+def partition (p : alpha -> Bool) (xs : List alpha) :
+    List alpha × List alpha :=
+  sorry
+
+-- Exercise 12 (hard): Implement quicksort for List Nat
+def quickSort (xs : List Nat) : List Nat := sorry
+
+-- Exercise 13 (hard): Implement unfold
+-- Generate a list from a seed value. The function f returns
+-- none to stop, or some (element, nextSeed) to continue.
+def unfold (f : sigma -> Option (alpha × sigma)) (seed : sigma)
+    (fuel : Nat) : List alpha :=
+  sorry
+
+-- Exercise 14 (challenge): Balanced BST insertion
+-- Define a simple BST and an insert function that maintains
+-- the BST property.
+inductive BST where
+  | empty : BST
+  | node (left : BST) (val : Nat) (right : BST) : BST
+
+def BST.insert (t : BST) (x : Nat) : BST := sorry
+
+def BST.toList : BST -> List Nat := sorry

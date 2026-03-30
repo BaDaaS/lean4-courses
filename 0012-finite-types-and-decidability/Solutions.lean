@@ -40,4 +40,45 @@ def fin3ToString : Fin 3 -> String
   | 1 => "one"
   | 2 => "two"
 
+-- Exercise 9 (medium): Count elements satisfying a decidable predicate
+def countIf {alpha : Type u} (p : alpha -> Prop)
+    [DecidablePred p] (xs : List alpha) : Nat :=
+  xs.foldl (fun acc x => if p x then acc + 1 else acc) 0
+
+#eval countIf (fun n : Nat => n > 3) [1, 2, 5, 8, 3]  -- 2
+
+-- Exercise 10 (hard): Decidable conjunction, constructed manually
+def decidableAnd (P Q : Prop) [dp : Decidable P]
+    [dq : Decidable Q] : Decidable (P /\ Q) :=
+  match dp, dq with
+  | isTrue hp, isTrue hq => isTrue (And.intro hp hq)
+  | isFalse hp, _ => isFalse (fun h => hp h.1)
+  | _, isFalse hq => isFalse (fun h => hq h.2)
+
+-- Exercise 11 (hard): Bounded search
+def boundedSearch (p : Nat -> Prop) [DecidablePred p]
+    (bound : Nat) : Option Nat :=
+  go 0
+where
+  go (i : Nat) : Option Nat :=
+    if i >= bound then none
+    else if p i then some i
+    else go (i + 1)
+  termination_by bound - i
+
+-- Exercise 12 (challenge): Decidable equality on List Nat, manually
+def listNatDecEqManual :
+    (xs ys : List Nat) -> Decidable (xs = ys)
+  | [], [] => isTrue rfl
+  | [], _ :: _ => isFalse (fun h => by cases h)
+  | _ :: _, [] => isFalse (fun h => by cases h)
+  | x :: xs, y :: ys =>
+    if hxy : x = y then
+      match listNatDecEqManual xs ys with
+      | isTrue htl => isTrue (by rw [hxy, htl])
+      | isFalse htl =>
+        isFalse (fun h => by cases h; exact htl rfl)
+    else
+      isFalse (fun h => by cases h; exact hxy rfl)
+
 end Course0012

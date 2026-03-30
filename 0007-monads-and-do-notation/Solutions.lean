@@ -60,4 +60,72 @@ def greet (name : String) : IO Unit := do
   IO.println "Welcome to Lean 4."
   IO.println "Have fun!"
 
+-- ============================================================
+-- Additional Exercises
+-- ============================================================
+
+-- Exercise 9 (medium): mapM for List
+def mapM' {m : Type -> Type} [Monad m] {alpha beta : Type}
+    (f : alpha -> m beta) : List alpha -> m (List beta)
+  | [] => pure []
+  | x :: xs => do
+    let y <- f x
+    let ys <- mapM' f xs
+    pure (y :: ys)
+
+#eval mapM' (fun n => if n > 0 then some n else none) [1, 2, 3]
+-- some [1, 2, 3]
+#eval mapM' (fun n => if n > 0 then some n else none) [1, 0, 3]
+-- none
+
+-- Exercise 10 (hard): State monad from scratch
+structure MyState (s : Type) (alpha : Type) where
+  run : s -> alpha × s
+
+instance {s : Type} : Monad (MyState s) where
+  pure x := { run := fun s => (x, s) }
+  bind ma f := {
+    run := fun s =>
+      let (a, s') := ma.run s
+      (f a).run s'
+  }
+
+def myGet {s : Type} : MyState s s :=
+  { run := fun s => (s, s) }
+
+def mySet {s : Type} (newState : s) : MyState s Unit :=
+  { run := fun _ => ((), newState) }
+
+-- Exercise 11 (hard): Counter using State monad
+def countItems {alpha : Type} (xs : List alpha) : Nat :=
+  let counter : MyState Nat Unit := do
+    for _ in xs do
+      let n <- myGet
+      mySet (n + 1)
+  (counter.run 0).2
+
+#eval countItems [10, 20, 30, 40]  -- 4
+
+-- Exercise 12 (challenge): Writer monad
+structure Writer (w : Type) (alpha : Type) where
+  run : alpha × w
+
+def tell (msg : String) : Writer (List String) Unit :=
+  { run := ((), [msg]) }
+
+instance : Monad (Writer (List String)) where
+  pure x := { run := (x, []) }
+  bind ma f :=
+    let (a, w1) := ma.run
+    let (b, w2) := (f a).run
+    { run := (b, w1 ++ w2) }
+
+def loggedAdd (a b : Nat) : Writer (List String) Nat := do
+  tell s!"Adding {a} and {b}"
+  let result := a + b
+  tell s!"Result is {result}"
+  pure result
+
+#eval (loggedAdd 3 4).run  -- (7, ["Adding 3 and 4", "Result is 7"])
+
 end Course0007

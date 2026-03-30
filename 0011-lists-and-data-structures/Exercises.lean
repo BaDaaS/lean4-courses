@@ -44,3 +44,35 @@ def Stack.peek (s : Stack alpha) : Option alpha := sorry
 theorem length_map (f : alpha -> beta) (xs : List alpha) :
     (xs.map f).length = xs.length := by
   sorry
+
+-- ============================================================
+-- Additional Exercises
+-- ============================================================
+
+-- Exercise 9 (medium): Prove that filter preserves membership
+-- If x is in (filter p xs), then x is in xs.
+theorem mem_of_mem_filter {alpha : Type} (p : alpha -> Bool)
+    (xs : List alpha) (x : alpha)
+    (h : x ∈ xs.filter p) : x ∈ xs := by
+  sorry
+
+-- Exercise 10 (hard): Implement lookup for association lists
+-- and prove it finds the correct value.
+def assocLookup {alpha : Type} [BEq alpha] {beta : Type}
+    (key : alpha) : List (alpha × beta) -> Option beta
+  | [] => none
+  | (k, v) :: rest =>
+    if k == key then some v else assocLookup key rest
+
+-- Exercise 11 (hard): Prove that length of filter is <= length
+-- of original list.
+theorem length_filter_le {alpha : Type} (p : alpha -> Bool)
+    (xs : List alpha) :
+    (xs.filter p).length <= xs.length := by
+  sorry
+
+-- Exercise 12 (challenge): Prove reverse distributes over append
+-- reverse (xs ++ ys) = reverse ys ++ reverse xs
+theorem reverse_append {alpha : Type} (xs ys : List alpha) :
+    (xs ++ ys).reverse = ys.reverse ++ xs.reverse := by
+  sorry

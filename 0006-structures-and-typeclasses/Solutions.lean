@@ -61,4 +61,70 @@ instance : MyMonoid String where
   mempty := ""
   mappend := String.append
 
+-- ============================================================
+-- Additional Exercises
+-- ============================================================
+
+-- Exercise 10 (medium): Ord typeclass for Nat
+class MyOrd (alpha : Type) where
+  cmp : alpha -> alpha -> Ordering
+
+instance : MyOrd Nat where
+  cmp a b := compare a b
+
+def myMax {alpha : Type} [MyOrd alpha] (a b : alpha) : alpha :=
+  match MyOrd.cmp a b with
+  | .gt => a
+  | _ => b
+
+#eval myMax 3 7  -- 7
+
+-- Exercise 11 (hard): Functor typeclass with Box
+structure Box (alpha : Type) where
+  val : alpha
+
+class MyFunctor (F : Type -> Type) where
+  fmap : {alpha beta : Type} -> (alpha -> beta) -> F alpha -> F beta
+
+instance : MyFunctor Box where
+  fmap f b := { val := f b.val }
+
+instance : MyFunctor List where
+  fmap := List.map
+
+#eval (MyFunctor.fmap (. + 1) (Box.mk 41)).val  -- 42
+
+-- Exercise 12 (hard): Vec2 addition is commutative (using Int)
+structure IntVec2 where
+  x : Int
+  y : Int
+deriving Repr, BEq, DecidableEq
+
+def IntVec2.add (a b : IntVec2) : IntVec2 :=
+  { x := a.x + b.x, y := a.y + b.y }
+
+theorem intVec2_add_comm (a b : IntVec2) :
+    IntVec2.add a b = IntVec2.add b a := by
+  simp [IntVec2.add, Int.add_comm]
+
+-- Exercise 13 (challenge): Ring typeclass for Int
+class MyRing (R : Type) where
+  zero : R
+  one : R
+  add : R -> R -> R
+  mul : R -> R -> R
+  neg : R -> R
+
+instance : MyRing Int where
+  zero := 0
+  one := 1
+  add := Int.add
+  mul := Int.mul
+  neg := Int.neg
+
+def square {R : Type} [MyRing R] (x : R) : R :=
+  MyRing.mul x x
+
+#eval square (3 : Int)  -- 9
+
 end Course0006

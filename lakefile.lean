@@ -74,3 +74,38 @@ lean_lib Course0015 where
   srcDir := "0015-automation-and-simp"
   roots := #[`Solutions]
 
+lean_lib Course0017 where
+  srcDir := "0017-projects"
+  roots := #[`Solutions]
+
+lean_lib Course0019 where
+  srcDir := "0019-lakefile-and-lake"
+  roots := #[`Solutions]
+
+lean_lib Course0025 where
+  srcDir := "0025-contributing-to-mathlib"
+  roots := #[`Solutions]
+
+lean_lib Course0026 where
+  srcDir := "0026-contributing-to-cslib"
+  roots := #[`Solutions]
+
+lean_lib Course0027 where
+  srcDir := "0027-contributing-to-arklib"
+  roots := #[`Solutions]
+
+lean_lib Course0028 where
+  srcDir := "0028-lean-internals"
+  roots := #[`Solutions]
+
+lean_lib Course0029 where
+  srcDir := "0029-elaboration-and-unification"
+  roots := #[`Solutions]
+
+lean_lib Course0030 where
+  srcDir := "0030-advanced-metaprogramming"
+  roots := #[`Solutions]
+
+lean_lib Course0031 where
+  srcDir := "0031-type-theory-foundations"
+  roots := #[`Solutions]

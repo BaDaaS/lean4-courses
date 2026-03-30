@@ -58,3 +58,75 @@ instance : MyMonoid Nat where
 instance : MyMonoid String where
   mempty := sorry
   mappend := sorry
+
+-- ============================================================
+-- Additional Exercises
+-- ============================================================
+
+-- Exercise 10 (medium): Define an Ord typeclass for comparison
+-- It should have a single method `cmp` that returns Ordering.
+-- Provide an instance for Nat.
+class MyOrd (alpha : Type) where
+  cmp : alpha -> alpha -> Ordering
+
+instance : MyOrd Nat where
+  cmp := sorry
+
+-- Use it to write a generic `myMax` function
+def myMax {alpha : Type} [MyOrd alpha] (a b : alpha) : alpha := sorry
+
+-- Exercise 11 (hard): Define a Functor-like typeclass and Box type
+-- Box wraps a single value. MyFunctor has a single method `fmap`.
+structure Box (alpha : Type) where
+  val : alpha
+
+class MyFunctor (F : Type -> Type) where
+  fmap : {alpha beta : Type} -> (alpha -> beta) -> F alpha -> F beta
+
+instance : MyFunctor Box where
+  fmap := sorry
+
+instance : MyFunctor List where
+  fmap := sorry
+
+-- Exercise 12 (hard): Prove Vec2 addition is commutative
+-- We cannot use `=` on Float directly (no DecidableEq), so define
+-- a propositional version: two Vec2s are "pairwise equal" when
+-- their fields are equal.
+-- Hint: Float.add_comm is not available, so state the theorem
+-- in terms of a generic commutative addition.
+-- Instead, define a simple IntVec2 with Int fields and prove it.
+structure IntVec2 where
+  x : Int
+  y : Int
+deriving Repr, BEq, DecidableEq
+
+def IntVec2.add (a b : IntVec2) : IntVec2 :=
+  { x := a.x + b.x, y := a.y + b.y }
+
+theorem intVec2_add_comm (a b : IntVec2) :
+    IntVec2.add a b = IntVec2.add b a := by
+  sorry
+
+-- Exercise 13 (challenge): Define a Ring typeclass and provide
+-- an instance for Int.
+-- A ring has: zero, one, add, mul, neg
+-- with the usual laws (you only need to state the structure,
+-- not prove the laws for the exercise).
+class MyRing (R : Type) where
+  zero : R
+  one : R
+  add : R -> R -> R
+  mul : R -> R -> R
+  neg : R -> R
+
+instance : MyRing Int where
+  zero := sorry
+  one := sorry
+  add := sorry
+  mul := sorry
+  neg := sorry
+
+-- Use the ring to write a generic function:
+-- square x = x * x
+def square {R : Type} [MyRing R] (x : R) : R := sorry

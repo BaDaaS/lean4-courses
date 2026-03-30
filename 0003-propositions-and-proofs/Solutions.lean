@@ -50,4 +50,33 @@ theorem de_morgan_and (P Q : Prop) :
     (fun hp => h (Or.inl hp))
     (fun hq => h (Or.inr hq))
 
+-- =============================================
+-- Additional exercises (increasing difficulty)
+-- =============================================
+
+-- Exercise 10 (medium): Left projection from And
+theorem and_left (P Q : Prop) : P /\ Q -> P :=
+  fun h => h.left
+
+-- Exercise 11 (hard): Contrapositive
+theorem contrapositive (P Q : Prop) : (P -> Q) -> (Not Q -> Not P) :=
+  fun hpq hnq hp => hnq (hpq hp)
+
+-- Exercise 12 (hard): Peirce's law using classical logic
+theorem peirce_classical (P Q : Prop) : ((P -> Q) -> P) -> P := by
+  intro h
+  cases Classical.em P with
+  | inl hp  => exact hp
+  | inr hnp =>
+    apply h
+    intro hp
+    exact absurd hp hnp
+
+-- Exercise 13 (challenge): Material implication
+theorem material_implication (P Q : Prop) : (P -> Q) -> (Not P \/ Q) := by
+  intro hpq
+  cases Classical.em P with
+  | inl hp  => exact Or.inr (hpq hp)
+  | inr hnp => exact Or.inl hnp
+
 end Course0003

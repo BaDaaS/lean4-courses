@@ -42,3 +42,31 @@ theorem and_assoc_tactic : (P /\ Q) /\ R -> P /\ (Q /\ R) := by
 -- Exercise 9 (challenge): Prove this using only tactics
 theorem challenge : (P -> Q) -> (Q -> R) -> (R -> P) -> P -> P /\ Q /\ R := by
   sorry
+
+-- =============================================
+-- Additional exercises (increasing difficulty)
+-- =============================================
+
+-- Exercise 10 (medium): Use obtain to destructure nested And
+-- Given P /\ (Q /\ R), prove R /\ P
+theorem nested_and : P /\ (Q /\ R) -> R /\ P := by
+  sorry
+
+-- Exercise 11 (hard): Prove an iff using constructor
+-- P /\ Q <-> Q /\ P
+theorem and_comm_iff : P /\ Q <-> Q /\ P := by
+  sorry
+
+-- Exercise 12 (hard): Use a calc block for multi-step equality
+-- Prove that (a + b) + c = (c + b) + a for natural numbers
+-- Hint: use Nat.add_comm and Nat.add_assoc in calc steps
+theorem add_rearrange (a b c : Nat) :
+    (a + b) + c = (c + b) + a := by
+  sorry
+
+-- Exercise 13 (challenge): Prove that reversing a non-empty list
+-- preserves the property of having length > 0.
+-- Hint: use simp with List.length_reverse
+theorem reverse_length_pos (alpha : Type) (xs : List alpha)
+    (h : xs.length > 0) : xs.reverse.length > 0 := by
+  sorry

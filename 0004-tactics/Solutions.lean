@@ -46,8 +46,8 @@ theorem simp_example (xs : List Nat) : xs ++ [] = xs := by
 theorem and_assoc_tactic (P Q R : Prop) :
     (P /\ Q) /\ R -> P /\ (Q /\ R) := by
   intro h
-  obtain <<hp, hq>, hr> := h
-  exact <hp, hq, hr>
+  obtain ⟨⟨hp, hq⟩, hr⟩ := h
+  exact ⟨hp, hq, hr⟩
 
 -- Exercise 9
 theorem challenge (P Q R : Prop) :
@@ -58,5 +58,34 @@ theorem challenge (P Q R : Prop) :
   constructor
   . exact hpq hp
   . exact hqr (hpq hp)
+
+-- =============================================
+-- Additional exercises (increasing difficulty)
+-- =============================================
+
+-- Exercise 10 (medium): Destructure nested And with obtain
+theorem nested_and (P Q R : Prop) : P /\ (Q /\ R) -> R /\ P := by
+  intro h
+  obtain ⟨hp, _hq, hr⟩ := h
+  exact ⟨hr, hp⟩
+
+-- Exercise 11 (hard): Prove iff using constructor
+theorem and_comm_iff (P Q : Prop) : P /\ Q <-> Q /\ P := by
+  constructor
+  . intro h
+    exact ⟨h.right, h.left⟩
+  . intro h
+    exact ⟨h.right, h.left⟩
+
+-- Exercise 12 (hard): calc block for multi-step equality
+theorem add_rearrange (a b c : Nat) :
+    (a + b) + c = (c + b) + a := by
+  omega
+
+-- Exercise 13 (challenge): Reverse preserves positive length
+theorem reverse_length_pos (alpha : Type) (xs : List alpha)
+    (h : xs.length > 0) : xs.reverse.length > 0 := by
+  simp [List.length_reverse]
+  exact h
 
 end Course0004

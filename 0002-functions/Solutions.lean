@@ -36,4 +36,52 @@ def myMax (a b : Nat) : Nat :=
 #eval myMax 3 7  -- 7
 #eval myMax 9 2  -- 9
 
+-- =============================================
+-- Additional exercises (increasing difficulty)
+-- =============================================
+
+-- Exercise 8 (medium): Pipe operator
+def pipe {alpha beta : Type} (x : alpha) (f : alpha -> beta) : beta := f x
+
+infixl:1 " |>> " => pipe
+
+#eval pipe 5 (fun n : Nat => n * 2)  -- 10
+#eval pipe (pipe 5 (fun n : Nat => n + 1)) (fun n => n * 3)  -- 18
+
+-- Exercise 9 (hard): Compose is associative
+theorem compose_assoc {alpha beta gamma delta : Type}
+    (f : gamma -> delta) (g : beta -> gamma) (h : alpha -> beta) :
+    compose f (compose g h) = compose (compose f g) h := by
+  rfl
+
+-- Exercise 10 (hard): Apply a list of functions sequentially
+def applyAll {alpha : Type} (fs : List (alpha -> alpha)) (x : alpha) : alpha :=
+  match fs with
+  | [] => x
+  | f :: rest => applyAll rest (f x)
+
+#eval applyAll [(fun n : Nat => n + 1), (fun n => n * 2), (fun n => n + 10)] 5
+-- 22
+
+-- Exercise 11 (challenge): Church numerals
+def churchZero {alpha : Type} (_f : alpha -> alpha) (x : alpha) : alpha := x
+
+def churchSucc {alpha : Type}
+    (n : (alpha -> alpha) -> alpha -> alpha)
+    (f : alpha -> alpha) (x : alpha) : alpha :=
+  f (n f x)
+
+def churchAdd {alpha : Type}
+    (m n : (alpha -> alpha) -> alpha -> alpha)
+    (f : alpha -> alpha) (x : alpha) : alpha :=
+  m f (n f x)
+
+-- Church numeral 1 = succ zero
+#eval churchSucc churchZero (fun n : Nat => n + 1) 0  -- 1
+-- Church numeral 2 + 3 = 5
+#eval churchAdd
+  (churchSucc (churchSucc churchZero))
+  (churchSucc (churchSucc (churchSucc churchZero)))
+  (fun n : Nat => n + 1) 0  -- 5
+
 end Course0002

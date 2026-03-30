@@ -46,3 +46,31 @@ theorem gauss_formula (n : Nat) : 2 * sumTo n = n * (n + 1) := by
 theorem length_append (xs ys : List alpha) :
     (xs ++ ys).length = xs.length + ys.length := by
   sorry
+
+-- ============================================================
+-- Additional Exercises
+-- ============================================================
+
+-- Exercise 10 (medium): Prove n + succ m = succ (n + m)
+theorem add_succ' (n m : Nat) : n + (m + 1) = (n + m) + 1 := by
+  sorry
+
+-- Exercise 11 (hard): Prove multiplication distributes over addition
+-- a * (b + c) = a * b + a * c
+theorem mul_add' (a b c : Nat) : a * (b + c) = a * b + a * c := by
+  sorry
+
+-- Exercise 12 (hard): Prove power law a^(b+c) = a^b * a^c
+-- Use Nat.pow
+theorem pow_add' (a b c : Nat) :
+    a ^ (b + c) = a ^ b * a ^ c := by
+  sorry
+
+-- Exercise 13 (challenge): Prove sum of first n odd numbers = n^2
+-- odd(k) = 2*k + 1, so sum_{k=0}^{n-1} (2*k+1) = n^2
+def sumOdds : Nat -> Nat
+  | 0 => 0
+  | n + 1 => (2 * n + 1) + sumOdds n
+
+theorem sum_odds_eq_sq (n : Nat) : sumOdds n = n ^ 2 := by
+  sorry

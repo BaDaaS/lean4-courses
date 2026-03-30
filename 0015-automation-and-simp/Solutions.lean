@@ -55,4 +55,41 @@ theorem challenge_auto (n m : Nat) (h : n > 0) (h2 : m > 0) :
     n * m > 0 := by
   exact Nat.mul_pos h h2
 
+-- Exercise 11 (medium): Custom simp set
+def triple (n : Nat) : Nat := 3 * n
+
+@[simp]
+theorem triple_eq (n : Nat) : triple n = 3 * n := rfl
+
+theorem triple_2 : triple 2 = 6 := by
+  simp only [triple_eq]
+
+-- Exercise 12 (hard): conv to rewrite inside nested expression
+theorem conv_nested (a b : Nat) :
+    (a + 0) + (b + 0) = a + b := by
+  conv =>
+    lhs
+    rw [Nat.add_zero, Nat.add_zero]
+
+-- Exercise 13 (hard): Combine simp and omega
+theorem combo_multi (xs : List Nat) (n : Nat) :
+    (xs ++ [n]).length = xs.length + 1 := by
+  simp
+
+-- Exercise 14 (hard): conv targeted rewrite
+theorem conv_targeted (a b c : Nat) (h : a = b) :
+    a + c = b + c := by
+  conv =>
+    lhs
+    rw [h]
+
+-- Exercise 15 (challenge): Careful tactic sequencing
+def myFun (n : Nat) : Nat := n * 2 + 1
+
+theorem challenge_sequencing (a b : Nat)
+    (h : a = b + 3) :
+    myFun a = myFun b + 6 := by
+  unfold myFun
+  omega
+
 end Course0015
