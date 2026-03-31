@@ -713,6 +713,78 @@ example (h : P) (hpq : P -> Q) : Q := by
 Replaces a hypothesis with a new one. `replace h := e` removes
 the old `h` and adds a new `h` with the type of `e`.
 
+### trivial
+
+**What you write:**
+
+```lean
+example : True := by trivial
+```
+
+**What it builds:** Tries `rfl`, `assumption`, and `True.intro` in
+sequence. A quick way to close simple goals.
+
+**Term built:** `True.intro` (for `True` goals), or whatever
+`assumption`/`rfl` would build.
+
+### and_intros
+
+**What you write:**
+
+```lean
+example (hp : P) (hq : Q) (hr : R) : P /\ Q /\ R := by
+  refine ⟨?_, ?_, ?_⟩ <;> assumption
+```
+
+Recursively applies `And.intro` to split nested conjunctions.
+
+### classical
+
+**What you write:**
+
+```lean
+example (P : Prop) : P \/ Not P := by
+  classical
+  exact Classical.em P
+```
+
+Makes the law of excluded middle (`Classical.em`) available. After
+`classical`, you can use non-constructive reasoning.
+
+Under the hood, this opens access to the `Classical.choice` axiom,
+one of Lean's three axioms. Without `classical`, Lean's logic is
+constructive.
+
+**Reference:** The law of excluded middle as an axiom in constructive
+systems traces to Brouwer's rejection of it (1908) and Heyting's
+formalization of intuitionist logic (1930). Lean follows the CIC
+tradition of making it optional.
+
+### false_or_by_contra
+
+Setup for proof by contradiction. If the goal is `P`, changes it
+to assume `Not P` and derive `False`. This is the tactic behind
+Mathlib's `by_contra`.
+
+```lean
+example (n : Nat) (h : n > 0) : n != 0 := by
+  false_or_by_contra
+  omega
+```
+
+### fun_cases
+
+Case-split on a function application. If the goal involves `f x`
+where `f` is defined by pattern matching, `fun_cases` splits on
+which branch of `f` applies.
+
+### subst_vars / subst_eqs
+
+`subst_vars` substitutes all equalities of the form `x = e` or
+`e = x` in the context (where `x` is a free variable).
+
+`subst_eqs` is similar but works on all equations simultaneously.
+
 ---
 
 ## 9. Control Flow
@@ -951,7 +1023,33 @@ hints: `grind [h1, h2]`.
 ### linarith / lia
 
 Linear arithmetic. `linarith` proves linear inequality goals.
-`lia` is an alias.
+`lia` is an alias. In Lean 4.29+, these are implemented via `grind`.
+
+### bv_decide / bv_omega
+
+Decision procedures for bitvector arithmetic (`BitVec n`).
+`bv_decide` uses a SAT solver. `bv_omega` combines `omega` with
+bitvector reasoning.
+
+### ac_rfl / ac_nf
+
+Associativity-commutativity reasoning.
+
+`ac_rfl` closes a goal `a = b` when `a` and `b` are equal up to
+reordering under associative-commutative operations.
+
+`ac_nf` normalizes terms into AC-canonical form without closing
+the goal.
+
+### cbv
+
+Call-by-value evaluation. Fully reduces the goal using the kernel's
+evaluator. More aggressive than `dsimp` (which only does definitional
+simplification).
+
+```lean
+example : Nat.factorial 5 = 120 := by native_decide
+```
 
 ---
 
@@ -1045,4 +1143,12 @@ for a registered instance of the typeclass and returns it.
 | `congr` | `congrArg f ?_` | Reduce f a = f b to a = b |
 | `revert x` | (undo `intro`) | Move variable back to goal |
 | `clear h` | (drop unused binding) | Remove from context |
+| `trivial` | `True.intro` or `rfl` | Close simple goals |
+| `split` | case-split on match/if | Branch on definition |
+| `generalize e = x` | (replace concrete with variable) | Make goal more general |
+| `classical` | (enable excluded middle) | Enter classical logic |
+| `subst h` | (substitute equality) | Eliminate a variable |
+| `injection h` | (constructor injectivity) | Extract from Nat.succ = Nat.succ |
+| `grind` | (SMT-like automation) | Congruence + arithmetic |
+| `ac_rfl` | (AC normalization) | Reorder commutative ops |
 | `sorry` | `sorryAx _` | Axiom placeholder (unsound) |
