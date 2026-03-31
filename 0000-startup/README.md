@@ -4,6 +4,10 @@
 
 Get Lean 4 installed and running. Write your first definitions and proofs.
 
+**Lore:**
+- [def vs theorem vs example](../lore/def-vs-theorem.md) - What the kernel sees
+- [From LCF to Lean](../lore/lcf-to-lean.md) - The family tree of proof assistants
+
 ## Installation
 
 1. Install elan (Lean version manager):

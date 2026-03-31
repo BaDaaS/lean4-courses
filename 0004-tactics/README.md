@@ -8,6 +8,13 @@ you use commands (tactics) that transform the proof state step by step.
 A separate file `TACTICS_REFERENCE.md` contains the exhaustive list of
 all built-in tactics with their Curry-Howard explanations.
 
+**Lore:**
+- [Why "tactic"?](../lore/why-tactic.md) - From Milner's LCF (1972)
+- [Why inl/inr?](../lore/why-inl-inr.md) - Category theory coproduits
+- [What tactics actually build](../lore/what-tactics-build.md) - Step-by-step term construction
+- [What omega does](../lore/what-omega-does.md) - The full pipeline
+- [What simp does](../lore/what-simp-does.md) - The rewriting engine
+
 ---
 
 ## Term Mode vs Tactic Mode

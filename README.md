@@ -88,6 +88,14 @@ lake build
 This compiles all Solutions.lean files (0000-0015) and verifies they
 type-check.
 
+## Lore
+
+The [lore/](lore/) directory contains behind-the-scenes stories,
+etymologies, and deep explanations. Why is it called a "tactic"?
+What does `omega` actually do? How did we get from LCF to Lean?
+
+Each lore file is self-contained and linked from the relevant course.
+
 ## Running Exercises
 
 ```bash

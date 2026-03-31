@@ -5,6 +5,11 @@
 Understand the Curry-Howard correspondence: propositions are types, proofs
 are terms. Learn to construct proofs of basic logical statements.
 
+**Lore:**
+- [The Curry-Howard correspondence](../lore/curry-howard.md) - The full history
+- [Why modus ponens is function application](../lore/why-modus-ponens.md)
+- [def vs theorem](../lore/def-vs-theorem.md) - Why proofs are erased
+
 ## Curry-Howard Correspondence
 
 | Logic | Lean (Types) |

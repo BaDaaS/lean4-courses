@@ -6,6 +6,11 @@ Understand how Lean 4 works under the hood: the kernel, the elaborator,
 the compiler, and the runtime. This is essential for becoming a Lean
 expert rather than just a user.
 
+**Lore:**
+- [What the kernel checks](../lore/what-the-kernel-checks.md) - The trusted core
+- [def vs theorem](../lore/def-vs-theorem.md) - Declaration kinds in the kernel
+- [From LCF to Lean](../lore/lcf-to-lean.md) - Historical lineage
+
 ## Lean 4 Architecture
 
 ```
