@@ -76,6 +76,41 @@ theorem exists_example : Exists (fun n : Nat => n > 0) :=
   -- witness: 1, proof: 0 < 1
 ```
 
+## Why `theorem` vs `def`?
+
+Since proofs are just terms, you could write:
+
+```lean
+def my_proof : 1 + 1 = 2 := rfl
+```
+
+This works. But `theorem` is better for proofs because:
+
+1. **Proof erasure.** The body of a `theorem` is erased at compile
+   time. The compiled program never needs to inspect proofs at
+   runtime. This is safe because of **proof irrelevance**: all proofs
+   of the same `Prop` are definitionally equal (see course 0031).
+
+2. **Opacity.** The kernel does not unfold theorem bodies when
+   type-checking later definitions. This is a performance
+   optimization: proofs can be very large, and unfolding them would
+   slow down the kernel.
+
+3. **Intent.** `theorem` signals "this is a logical statement." `def`
+   signals "this is a computation." The distinction helps readers.
+
+An `example` is an anonymous theorem/def that is checked and
+discarded. Useful for quick tests.
+
+See the full classification of `def`/`theorem`/`example`/`abbrev`/
+`opaque`/`axiom` in course 0000.
+
+**Reference:** The Curry-Howard correspondence was independently
+discovered by Haskell Curry (1934, for combinatory logic) and
+William Alvin Howard (1969, for natural deduction). Howard's
+original manuscript, "The formulae-as-types notion of construction,"
+circulated as a manuscript from 1969 and was published in 1980.
+
 ## Math Track
 
 This is the foundation of formal mathematics. Every theorem in Mathlib

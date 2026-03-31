@@ -128,14 +128,99 @@ def safeDiv (a b : Nat) (h : b > 0) : Nat := a / b
 
 ## Environment and Declarations
 
+Every top-level declaration in Lean adds an entry to the
+**environment**, a persistent map from `Name` to `Declaration`.
+The `Declaration` type in the kernel has these variants:
+
+### Declaration Kinds in the Kernel
+
+| Kind | Body? | Compiled? | Reducible? | Erased? |
+|------|-------|-----------|------------|---------|
+| `axiomDecl` | no | no | n/a | yes |
+| `defnDecl` | yes | yes | configurable | no |
+| `thmDecl` | yes | no | no (opaque) | yes |
+| `opaqueDecl` | yes | depends | never | no |
+| `inductDecl` | (generates recursor) | yes | yes | no |
+
+### What Each Declaration Keyword Produces
+
+**`def`** creates a `defnDecl`. The body is stored and the kernel
+can unfold it during type-checking. The compiler generates executable
+code. The definition has a **reducibility hint** that controls when
+the elaborator unfolds it:
+
+- `@[reducible]` (or `abbrev`): always unfold
+- default: unfold when needed for type-checking
+- `@[irreducible]`: never unfold (treat as opaque for elaboration,
+  but the kernel can still see through it)
+
+**`theorem` / `lemma`** creates a `thmDecl`. The body (proof) is
+stored for verification, then **erased** before compilation. The
+kernel marks it opaque: later definitions cannot unfold the proof.
+This is safe because of **proof irrelevance** in `Prop`: if `p q :
+P` where `P : Prop`, then `p = q` definitionally.
+
+Why opaque? Performance. Proof terms can be enormous (thousands of
+nodes). If the kernel had to unfold proofs during type-checking of
+later definitions, compilation would be much slower.
+
+**`example`** creates a temporary `defnDecl` (or `thmDecl` for
+`Prop`-typed results), type-checks it, and then discards it. No
+name is registered in the environment.
+
+**`abbrev`** creates a `defnDecl` with the `@[reducible]` attribute.
+The elaborator and `simp` always unfold it. Use for type aliases:
+
 ```lean
--- Every definition in Lean creates a Declaration:
--- - axiom: no body, trusted
--- - definition: has a body (value)
--- - theorem: has a body (proof), erased at runtime
--- - opaque: has a body but kernel does not unfold it
--- - inductive: generates constructors and recursors
+abbrev Point := Nat x Nat
+-- The kernel always sees Nat x Nat, never Point
 ```
+
+**`opaque`** creates an `opaqueDecl`. The body exists (so the
+definition is well-typed), but the kernel is **forbidden** from
+unfolding it. This is stronger than `@[irreducible]`: even the
+kernel cannot see through it. Used for:
+- FFI bindings (`@[extern "c_func"] opaque ...`)
+- Sealing implementation details
+
+**`axiom`** creates an `axiomDecl` with no body. This is a raw
+postulate: "trust me, a term of this type exists." Dangerous,
+because an inconsistent axiom (`axiom bad : False`) makes every
+proposition provable. Lean has exactly three built-in axioms:
+
+1. `propext : (a <-> b) -> a = b` (propositional extensionality)
+2. `Quot.sound : r a b -> Quot.mk r a = Quot.mk r b`
+3. `Classical.choice : Nonempty a -> a` (axiom of choice)
+
+You can check which axioms a definition depends on with
+`#print axioms myDef`.
+
+**`noncomputable def`** creates a `defnDecl` but marks it as not
+compiled. The definition exists in the logic but has no executable
+code. Required when the body uses `Classical.choice` or other
+non-constructive principles in a computationally relevant position.
+
+### The Reducibility Hierarchy
+
+```
+abbrev  (@[reducible])    -- always unfolded
+   |
+  def   (default)         -- unfolded when needed
+   |
+  def   (@[irreducible])  -- elaborator won't unfold
+   |
+opaque                    -- kernel won't unfold
+   |
+theorem                   -- kernel won't unfold + erased
+```
+
+**Source:** The classification of declaration kinds is discussed at
+https://proofassistants.stackexchange.com/questions/1575 and in the
+Lean 4 kernel source (`src/kernel/declaration.h`).
+
+**Reference:** Proof irrelevance in the Calculus of Inductive
+Constructions is described in Werner, "On the Strength of Proof-
+Irrelevant Type Theories," Logical Methods in Computer Science, 2008.
 
 ## Reading Lean Source Code
 
