@@ -448,10 +448,90 @@ example (n : Nat) (h : n >= 5) : n >= 3 := by omega
 **What it builds:** A proof by a decision procedure for linear
 arithmetic over `Nat` and `Int`.
 
-Under the hood, omega encodes the goal as a system of linear
-inequalities and uses the Omega test (a complete decision procedure
-for Presburger arithmetic) to find a proof. The proof term is a
-sequence of arithmetic lemmas.
+**The full pipeline, step by step:**
+
+1. **Negate the goal (proof by contradiction).** omega does not build
+   a direct proof. It assumes the negation of the goal and tries to
+   derive `False`. For example, if the goal is `n >= 3`, omega
+   assumes `n < 3` (i.e., `n <= 2`) and tries to derive a
+   contradiction with the hypothesis `n >= 5`.
+
+2. **Convert everything to linear constraints over Int.** All `Nat`
+   values are cast to `Int`, and the constraint `0 <= (n : Int)` is
+   automatically added (since Nat is non-negative). Comparisons are
+   normalized: `x > y` becomes `x >= y + 1`, etc. The result is a
+   system of linear inequalities of the form:
+   ```
+   c0 + c1*x1 + c2*x2 + ... + cn*xn >= 0
+   ```
+
+   For our example, the system is:
+   ```
+   n - 5 >= 0      (from h : n >= 5)
+   2 - n >= 0      (from negated goal : n <= 2)
+   n >= 0          (from Nat non-negativity)
+   ```
+
+3. **Solve equalities by substitution.** If there are any exact
+   equalities (like `a = b`), omega eliminates variables by
+   substitution. For "hard" equalities where no coefficient is +/-1,
+   it uses a **balanced modular reduction** trick to create an easy
+   equality first (this is the core insight of William Pugh's
+   Omega test, 1991).
+
+4. **Eliminate inequalities via Fourier-Motzkin.** For the remaining
+   inequalities, omega picks a variable and combines all its lower
+   bounds with all its upper bounds to eliminate it. For our example:
+   ```
+   n >= 5     (lower bound on n)
+   n <= 2     (upper bound on n)
+   Combine: 5 <= n <= 2, which gives 5 <= 2, contradiction!
+   ```
+   More precisely, subtracting: `(n - 5) + (2 - n) >= 0` gives
+   `-3 >= 0`, which is `False`.
+
+5. **Build the proof term by unwinding.** omega tracks every step
+   (which hypotheses were used, which combinations were made) in a
+   "justification tree." Once `False` is derived, it walks the tree
+   backward and emits a chain of Lean lemma applications:
+   ```
+   False
+     <- Constraint.not_sat'_of_isImpossible (...)
+     <- combo_sat' [proof from h] [proof from negated goal]
+     <- tidy_sat [normalization proof]
+     <- assumption [original hypothesis]
+   ```
+
+**What omega handles:**
+- `+`, `-`, `*` (by a literal constant), `/` (by literal), `%` (by literal)
+- `<`, `<=`, `=`, `>=`, `>`, `!=`
+- `Nat` and `Int` (including `Nat` subtraction, which is tricky since
+  `(a - b : Nat)` is 0 when `a < b`)
+- `Nat` division and modulo (introduces auxiliary variables with bounds)
+- Divisibility (`k | n`)
+
+**What omega does NOT handle:**
+- Multiplication of two variables (`n * m` where neither is a literal)
+- Nonlinear arithmetic
+- Quantifiers (it only works on the current hypotheses)
+
+**Nat subtraction, the tricky case:** When omega sees
+`((a - b : Nat) : Int)`, it records a disjunction:
+- Either `b <= a` and the subtraction equals `a - b` (the normal case)
+- Or `a < b` and the subtraction equals `0` (Nat underflow)
+
+It tries to find a contradiction without splitting this disjunction.
+If it cannot, it splits and tries both branches.
+
+**Algorithm:** The Omega test by William Pugh (1991), with
+Fourier-Motzkin elimination for inequalities. The implementation does
+not use the "dark shadow" and "grey shadow" extensions from Pugh's
+full algorithm, so it is technically incomplete for problems requiring
+those. In practice, this almost never matters.
+
+**Reference:** William Pugh, "The Omega Test: a fast and practical
+integer programming algorithm for dependence analysis," 1991.
+https://doi.org/10.1145/125826.125848
 
 ### decide
 
