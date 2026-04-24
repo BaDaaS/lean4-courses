@@ -62,6 +62,9 @@ def area : Shape -> Float
   | .triangle b h   => 0.5 * b * h
 ```
 
+Note that the "dot" notation (ex: `.circle`) is a short-hand for the symbol
+`Shape.circle`. The compiler automatically infers the type to be used.
+
 ## Recursive Functions on Inductive Types
 
 ```lean
