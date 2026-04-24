@@ -2,18 +2,100 @@
 
 ## Goal
 
-Learn tactic-mode proofs. Instead of constructing proof terms directly,
-you use commands (tactics) that transform the proof state step by step.
+Learn tactic-mode proofs. Instead of constructing proof terms
+directly, you use commands (tactics) that transform the proof state
+step by step. Understand the LCF architecture that makes tactics
+safe, and how tactics relate to proof search in logic.
 
-A separate file `TACTICS_REFERENCE.md` contains the exhaustive list of
-all built-in tactics with their Curry-Howard explanations.
+A separate file `TACTICS_REFERENCE.md` contains the exhaustive list
+of all built-in tactics with their Curry-Howard explanations.
 
 **Lore:**
+
 - [Why "tactic"?](../lore/why-tactic.md) - From Milner's LCF (1972)
 - [Why inl/inr?](../lore/why-inl-inr.md) - Category theory coproduits
-- [What tactics actually build](../lore/what-tactics-build.md) - Step-by-step term construction
+- [What tactics actually build](../lore/what-tactics-build.md) -
+  Step-by-step term construction
 - [What omega does](../lore/what-omega-does.md) - The full pipeline
 - [What simp does](../lore/what-simp-does.md) - The rewriting engine
+
+---
+
+## The LCF Architecture: Why Tactics Are Safe
+
+Lean's tactic framework follows the **LCF architecture**, designed
+by Robin Milner for the Edinburgh LCF system (1972). The key insight:
+tactics are untrusted code that generates proof terms, and the
+kernel checks every generated term. A buggy tactic cannot produce a
+false proof.
+
+The architecture has two layers:
+
+1. **The kernel** (trusted, small): checks that a term has a given
+   type. It implements the typing rules of CIC. If the kernel
+   accepts `h : P`, then `P` is genuinely proved.
+
+2. **Tactics** (untrusted, large): programs that construct proof
+   terms. They can be arbitrarily complex, use heuristics, call
+   external solvers, or even contain bugs. The kernel verifies
+   their output.
+
+This separation means you can add new tactics without increasing
+the trusted computing base. Mathlib has hundreds of custom tactics.
+None of them can introduce unsoundness because every proof term
+they produce is checked by the kernel.
+
+In the original LCF, the kernel was an abstract type `thm` whose
+only constructors were the inference rules. You could not forge a
+`thm` value without applying a valid rule. Lean takes a different
+but equivalent approach: the kernel is a separate type-checker that
+validates the fully elaborated term.
+
+**Reference:** Milner, R. (1972). "Logic for Computable Functions:
+Description of a Machine Implementation." Stanford AI Memo 169.
+
+**Reference:** Gordon, M., Milner, R., and Wadsworth, C. (1979).
+"Edinburgh LCF: A Mechanised Logic of Computation." LNCS 78.
+Springer.
+
+## Forward vs. Backward Reasoning
+
+There are two fundamental directions for constructing proofs:
+
+**Forward reasoning** (term mode): start from what you know
+(hypotheses) and derive new facts until you reach the goal. This is
+how you write proof terms directly:
+
+```lean
+-- Start from hp and hpq, derive the goal
+theorem ex1 (hp : P) (hpq : P -> Q) : Q :=
+  hpq hp    -- apply what we know to get Q
+```
+
+**Backward reasoning** (tactic mode): start from the goal (what you
+want to prove) and reduce it to simpler subgoals until everything is
+trivially true. This is what tactics do:
+
+```lean
+-- Start from the goal Q, reduce it
+theorem ex2 (hp : P) (hpq : P -> Q) : Q := by
+  apply hpq    -- Q reduces to subgoal P
+  exact hp     -- P is in the context
+```
+
+Backward reasoning corresponds to **goal-directed proof search**.
+Given a goal `G`, you look for rules whose conclusion matches `G`
+and generate their premises as new subgoals. This is the strategy
+used by Prolog, by the `auto` tactic in Coq, and by Lean's `aesop`.
+
+Most real proofs mix both directions: backward reasoning to set up
+the proof structure, forward reasoning (`have`) to derive
+intermediate facts.
+
+**Reference:** The forward/backward distinction goes back to
+Robinson's resolution principle (1965) and Kowalski's work on logic
+programming (1974). Paulson adapted it for tactics in Isabelle
+(1989).
 
 ---
 
@@ -31,20 +113,37 @@ theorem p_implies_p_tactic (P : Prop) : P -> P := by
 ```
 
 Both modes produce the same thing: a term of the right type.
-Tactic mode is just a different way to build that term, step by step.
+Tactic mode is just a different way to build that term, step by
+step. You can verify this with `#print p_implies_p_tactic`: the
+output is `fun hp => hp`, identical to the term-mode version.
 
 ---
 
 ## The Curry-Howard View of Tactics
 
 Recall from course 0003: propositions are types, proofs are terms.
-A goal `P -> Q` is a function type. You need to construct a function.
+A goal `P -> Q` is a function type. You need to construct a
+function.
 
-Tactic mode is a **term construction machine**. At each step, you have:
+Tactic mode is a **term construction machine**. At each step, you
+have:
+
 - A **goal**: the type of the term you still need to build
 - A **context**: the terms (hypotheses) you already have
 
 Each tactic transforms the goal by partially building the term.
+
+Formally, a tactic takes a **proof state** (a list of goals, each
+with a context and a target type) and produces a new proof state
+with (hopefully) simpler goals. When all goals are discharged, the
+accumulated transformations yield a complete proof term.
+
+In Lean 4, tactics are monadic programs in the `TacticM` monad.
+They have access to the full metavariable context (the "proof
+state") and can create, assign, and manipulate metavariables.
+A metavariable `?m : T` represents an unfilled hole of type `T`.
+When a tactic assigns `?m := t`, it fills the hole. When all
+metavariables are assigned, the proof term is complete.
 
 **Example, side by side:**
 
@@ -502,11 +601,45 @@ exactly what you know (hypotheses) and what you need to show (goal).
 
 When a mathematician says "assume P holds", they are doing exactly
 what `intro hp` does: taking an arbitrary proof of P and working
-with it. When they say "by hypothesis, we are done", that is `exact`.
+with it. When they say "by hypothesis, we are done", that is
+`exact`.
 
 When they say "by induction on n", they are applying the recursor
-(`Nat.rec`), which requires a base case and a step with an induction
-hypothesis.
+(`Nat.rec`), which requires a base case and a step with an
+induction hypothesis.
+
+### The sequent calculus connection
+
+The tactic state can be read as a **sequent**:
+
+```
+hp : P, hq : Q |- R
+```
+
+This means: "given proofs of P and Q, we need to prove R." This is
+exactly a sequent in Gentzen's sequent calculus (1935). Each tactic
+corresponds to a sequent calculus rule applied **bottom-up** (from
+conclusion to premises):
+
+| Tactic | Sequent calculus rule |
+|--------|---------------------|
+| `intro hp` | Right introduction for -> |
+| `apply hpq` | Left elimination for -> (cut with hpq) |
+| `constructor` | Right introduction for /\ |
+| `left` / `right` | Right introduction for \/ |
+| `cases h` | Left elimination for \/ |
+| `exact hp` | Identity rule (axiom) |
+| `exfalso` | Weakening to False on the right |
+
+The sequent calculus has the **cut elimination theorem** (Gentzen's
+Hauptsatz): every proof with cuts can be transformed into a
+cut-free proof. In type theory terms, this corresponds to
+normalization: every proof term reduces to a normal form. Cut
+elimination is one of the deepest results in proof theory.
+
+**Reference:** Gentzen, G. (1935). "Untersuchungen uber das
+logische Schliessen." Mathematische Zeitschrift. Introduced both
+natural deduction and the sequent calculus.
 
 ## CS Track
 
@@ -530,3 +663,51 @@ partially-built program:
 When all goals are closed, Lean has a complete term. The tactic
 block compiles down to exactly the same lambda term you would have
 written by hand. Tactics are just an interactive way to write it.
+
+### Metavariables and elaboration
+
+Under the hood, the tactic framework uses **metavariables**
+(unification variables). When you write `by`, Lean creates a
+metavariable `?m` of the goal type. Each tactic assigns or
+transforms metavariables:
+
+```
+-- Starting state: need ?m : P -> Q -> P
+intro hp     -- ?m := fun hp => ?m1     (new ?m1 : Q -> P)
+intro _hq    -- ?m1 := fun _hq => ?m2   (new ?m2 : P)
+exact hp     -- ?m2 := hp               (done)
+-- Result: ?m = fun hp _hq => hp
+```
+
+This is the same mechanism the elaborator uses for type inference.
+Implicit arguments are metavariables that unification fills in.
+Tactics are essentially a user-facing interface to the same
+metavariable machinery.
+
+### Decidability and automation
+
+Some classes of propositions can be proved automatically by
+**decision procedures**: algorithms that always terminate and
+always give the correct yes/no answer.
+
+| Tactic | Decides | Theory | Complexity |
+|--------|---------|--------|------------|
+| `decide` | `Decidable` instances | Computation | Depends on instance |
+| `omega` | Linear arithmetic (Nat, Int) | Presburger arithmetic | Doubly exponential (worst case) |
+| `norm_num` | Numeric equalities/inequalities | Ground arithmetic | Polynomial |
+| `simp` | Equational theories | Term rewriting | Depends on lemma set |
+| `aesop` | First-order goals | Tableau search | Semi-decidable |
+
+A decision procedure for a theory T is an algorithm that, given
+any sentence in T, determines whether it is true or false. Tarski
+(1951) showed that the theory of real closed fields is decidable.
+Presburger (1929) showed that integer arithmetic with addition (but
+not multiplication) is decidable. On the other hand, Godel (1931)
+showed that arithmetic with both addition and multiplication is
+undecidable (incompleteness). This is why `omega` handles `+` but
+not general `*`.
+
+**Reference:** Presburger, M. (1929). "Uber die Vollstandigkeit
+eines gewissen Systems der Arithmetik ganzer Zahlen, in welchem die
+Addition als einzige Operation hervortritt." Comptes Rendus du
+Premier Congres de Mathematiciens des Pays Slaves.

@@ -62,23 +62,26 @@ theorem de_morgan_and : Not (P \/ Q) -> Not P /\ Not Q :=
 
 -- Exercise 10 (medium): Prove left projection from And
 -- If P /\ Q holds, then P holds.
-theorem and_left : P /\ Q -> P := sorry
+theorem and_left : P /\ Q -> P :=
+  fun hpq => hpq.left
 
 -- Exercise 11 (hard): Prove the contrapositive
 -- If P implies Q, then Not Q implies Not P.
 -- Recall: Not X is defined as X -> False
-theorem contrapositive : (P -> Q) -> (Not Q -> Not P) := sorry
+theorem contrapositive : (P -> Q) -> (Not Q -> Not P) :=
+  fun hpq hnq np =>
+    hnq (hpq np)
 
 -- Exercise 12 (hard): Peirce's law requires classical logic.
 -- We cannot prove ((P -> Q) -> P) -> P constructively.
 -- Instead, prove a weaker version: show that with classical
 -- excluded middle, we can derive it.
 -- Hint: use Classical.em P to case-split on P \/ Not P
-theorem peirce_classical : ((P -> Q) -> P) -> P := by
-  sorry
+-- theorem peirce_classical : ((P -> Q) -> P) -> P := by
+  -- sorry
 
 -- Exercise 13 (challenge): Prove one direction of material implication.
 -- (P -> Q) -> (Not P \/ Q)
 -- This requires classical logic. Use Classical.em P.
-theorem material_implication : (P -> Q) -> (Not P \/ Q) := by
-  sorry
+-- theorem material_implication : (P -> Q) -> (Not P \/ Q) := by
+  -- sorry

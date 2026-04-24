@@ -4,32 +4,70 @@
 
 -- Exercise 1: Define a type for traffic light colors
 inductive TrafficLight where
-  -- Add constructors: red, yellow, green
-  | placeholder  -- remove this and add real constructors
+  | red
+  | yellow
+  | green
+
+inductive WeekDay where
+  | monday
+  | tuesday
+  | wednesday
+  | thursday
+  | friday
+  | saturday
+  | sunday
+
+def isWeekEnd : WeekDay -> Bool
+  | WeekDay.monday | WeekDay.tuesday | WeekDay.wednesday
+  | WeekDay.thursday | WeekDay.friday => false
+  | WeekDay.saturday | WeekDay.sunday => true
+
+def isWeek : WeekDay -> Bool :=
+    fun w => not (isWeekEnd w)
 
 -- Exercise 2: Define a function that returns the next light color
-def nextLight : TrafficLight -> TrafficLight := sorry
+def nextLight : TrafficLight -> TrafficLight
+  | TrafficLight.red => .green
+  | TrafficLight.green => .yellow
+  | TrafficLight.yellow => .red
+
+def TrafficLightToString: TrafficLight -> String
+  | TrafficLight.red => "red"
+  | TrafficLight.yellow => "yellow"
+  | TrafficLight.green => "green"
+
+#eval TrafficLightToString (TrafficLight.yellow)
 
 -- Exercise 3: Define a binary tree of natural numbers
 inductive NatTree where
   | leaf : NatTree
-  | node (left : NatTree) (val : Nat) (right : NatTree) : NatTree
+  | node (left : NatTree) (val: Nat) (rght: NatTree) : NatTree
 
 -- Exercise 4: Count the number of nodes in a NatTree
-def countNodes : NatTree -> Nat := sorry
+def countNodes : NatTree -> Nat
+  | NatTree.leaf => 0
+  | NatTree.node l _v r => countNodes l + countNodes r + 1
 
 -- Exercise 5: Compute the sum of all values in a NatTree
-def treeSum : NatTree -> Nat := sorry
+def sumTree : NatTree -> Nat
+  | NatTree.leaf => 0
+  | NatTree.node l v r => sumTree l + sumTree r + v
 
 -- Exercise 6: Define your own natural numbers and addition
 inductive MyNat where
-  | zero : MyNat
-  | succ (n : MyNat) : MyNat
+  | zero: MyNat
+  | succ (n: MyNat) : MyNat
 
-def myAdd : MyNat -> MyNat -> MyNat := sorry
+def myAdd : MyNat -> MyNat -> MyNat
+  | MyNat.zero, m => m
+  | MyNat.succ n, m => .succ (myAdd n m)
 
 -- Exercise 7: Define multiplication on MyNat
-def myMul : MyNat -> MyNat -> MyNat := sorry
+def myMul : MyNat -> MyNat -> MyNat
+  | MyNat.zero, n => Zero
+  | n, MyNat.zero => Zero
+  | .succ n, m => myMul n (myMul n, m)
+  | n, .succ m => myMul m (myMul n, m)
 
 -- Exercise 8: Define a type for arithmetic expressions
 inductive Expr where

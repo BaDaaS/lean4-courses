@@ -9,6 +9,7 @@ theorem id_tactic (P : Prop) : P -> P := by
   intro hp
   exact hp
 
+
 -- Exercise 2
 theorem and_intro_tactic (P Q : Prop) (hp : P) (hq : Q) : P /\ Q := by
   constructor

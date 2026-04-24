@@ -8,28 +8,59 @@ variable (P Q R : Prop)
 
 -- Exercise 1: Prove P -> P using tactics
 theorem id_tactic : P -> P := by
-  sorry
+  intro hp
+  exact hp
+
+example (hpq : P -> Q) (hp : P) : Q := by
+  apply hpq
+  exact hp
+
+example (hp: P) (hq: Q) : P /\ Q := by
+  refine And.intro ?_ ?_
+  exact hp
+  exact hq
+
+example (hp: P) (hq: Q): P /\ Q := by
+  constructor
+  . exact hp
+  . exact hq
+
+example : Exists (fun n : Nat => n > 0) := by
+  exists 1
+
+example (h: P \/ Q) : Q \/ P := by
+  cases h with
+  | inl hp => right; exact hp
+  | inr hp => left; exact hp
 
 -- Exercise 2: Prove And introduction
 theorem and_intro_tactic (hp : P) (hq : Q) : P /\ Q := by
-  sorry
+  constructor
+  . exact hp
+  . exact hq
 
 -- Exercise 3: Prove Or commutativity using cases
 theorem or_comm_tactic : P \/ Q -> Q \/ P := by
-  sorry
+  intro h
+  cases h with
+  | inl hp => right; exact hp
+  | inr hq => left; exact hq
 
 -- Exercise 4: Use rw to prove an equality
 -- Hint: rewrite using h, then use rfl
 theorem rw_example (a b : Nat) (h : a = b) : a + 1 = b + 1 := by
-  sorry
+  rw [h]
 
 -- Exercise 5: Use omega to solve arithmetic
 theorem arith_example (n : Nat) (h : n >= 5) : n >= 3 := by
-  sorry
+  omega
 
 -- Exercise 6: Prove implication transitivity with tactics
 theorem trans_tactic : (P -> Q) -> (Q -> R) -> P -> R := by
-  sorry
+  intro hpq hqr hp
+  apply hqr
+  apply hpq
+  exact hp
 
 -- Exercise 7: Use simp to simplify
 theorem simp_example (xs : List Nat) : xs ++ [] = xs := by

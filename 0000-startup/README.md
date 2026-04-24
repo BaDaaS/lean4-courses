@@ -175,22 +175,142 @@ after type-checking.
 https://proofassistants.stackexchange.com/questions/1575 and in
 the Lean 4 reference manual.
 
+## What Lean Actually Is
+
+Lean 4 is an implementation of the **Calculus of Inductive
+Constructions** (CIC), a dependent type theory that serves as both
+a programming language and a logical foundation. Understanding
+what this means requires knowing three things: the kernel, the
+trusted computing base, and the elaboration pipeline.
+
+### The kernel
+
+The **kernel** (also called the type checker) is the small, trusted
+core of Lean. It checks that every term has the type you claim it
+has. If the kernel accepts `theorem T : P := proof`, then `proof`
+genuinely has type `P`, and `P` is a valid proposition. The
+soundness of every proof in Lean reduces to the correctness of
+this one component.
+
+The kernel implements the following **typing judgments** (see course
+0001 for the formal rules):
+
+1. `Gamma |- t : T` ("in context Gamma, term t has type T")
+2. `Gamma |- T : Sort u` ("T is a well-formed type in universe u")
+3. `Gamma |- t =_def s : T` ("t and s are definitionally equal at
+   type T")
+
+Definitional equality (judgment 3) is what makes `rfl` work. When
+you write `theorem : 1 + 1 = 2 := rfl`, the kernel computes both
+sides and checks they reduce to the same normal form (`2`). No
+lemma is needed because equality holds by computation.
+
+### The trusted computing base
+
+The **trusted computing base** (TCB) is everything you must trust
+for Lean's proofs to be valid. In Lean 4, this consists of:
+
+1. The kernel implementation (~5000 lines of C++)
+2. Three axioms:
+   - `propext : (a <-> b) -> a = b` (propositional extensionality)
+   - `Quot.sound : r a b -> Quot.mk r a = Quot.mk r b` (quotient
+     soundness)
+   - `Classical.choice : Nonempty alpha -> alpha` (axiom of choice)
+
+Everything else (tactics, elaboration, the standard library,
+Mathlib) is **untrusted**. Tactics generate proof terms, and the
+kernel checks them. A buggy tactic cannot produce a false theorem
+because the kernel would reject the proof term. This is the **de
+Bruijn criterion**, named after Nicolaas de Bruijn's Automath
+system (1967), the first proof checker to separate trusted checking
+from untrusted proof generation.
+
+### The elaboration pipeline
+
+When you write Lean code, it goes through several stages before
+the kernel sees it:
+
+```
+Source code
+  -> Parsing (syntax)
+  -> Macro expansion
+  -> Elaboration (type inference, implicit argument resolution,
+     coercion insertion, tactic execution)
+  -> Core term (fully explicit, no sugar)
+  -> Kernel type-checking
+```
+
+The elaborator is the most complex part. It resolves implicit
+arguments (the `{...}` and `[...]` parameters), inserts coercions
+(e.g., `Nat` to `Int`), runs tactics (producing proof terms), and
+performs unification. None of this is trusted. The output is a
+fully explicit **core term** that the kernel can check independently.
+
+You can see the core term with `#print`:
+
+```lean
+def double (n : Nat) : Nat := 2 * n
+#print double
+-- def double : Nat -> Nat :=
+-- fun n => 2 * n
+```
+
+### Three axioms, and what they mean
+
+**propext** (propositional extensionality): if two propositions are
+logically equivalent (`P <-> Q`), they are equal (`P = Q`). This is
+needed because Lean's `Prop` universe is **proof-irrelevant** (all
+proofs of P are equal), so propositions should be determined by
+their truth value alone. Without `propext`, you could have
+`P <-> Q` but `P != Q`, which is awkward.
+
+**Quot.sound**: quotient types respect their equivalence relation.
+If `r a b` holds, then `a` and `b` are equal in the quotient type.
+This is used to define the integers as a quotient of `Nat x Nat`
+by `(a, b) ~ (c, d) iff a + d = b + c`, and for many other
+mathematical constructions.
+
+**Classical.choice**: if a type is nonempty, you can extract an
+element. This is non-constructive: you get an element but no
+information about which one. It implies the law of excluded middle
+(`P \/ Not P` for all P) and makes Lean's logic classical rather
+than purely constructive. Code that uses `Classical.choice` is
+marked `noncomputable` because there is no algorithm to choose the
+element.
+
+These three axioms are independent and consistent with CIC. You can
+write fully constructive Lean code by avoiding `Classical.choice`.
+Lean tracks which axioms each definition depends on:
+
+```lean
+#print axioms my_theorem   -- shows which axioms were used
+```
+
 ## Math Track: Lean as a Proof Assistant
 
-Lean is a language where you can state mathematical theorems as types and
-provide proofs as terms. The type checker verifies your proofs are correct.
+Lean is a language where you can state mathematical theorems as types
+and provide proofs as terms. The type checker verifies your proofs
+are correct.
 
 ```lean
 -- A theorem is a type (the statement) with a term (the proof)
 theorem one_plus_one : 1 + 1 = 2 := rfl
 ```
 
-`rfl` means "reflexivity" - both sides compute to the same value.
+`rfl` means "reflexivity": both sides compute to the same value.
+The kernel reduces `1 + 1` to `2`, sees both sides are identical,
+and accepts `Eq.refl 2` as a proof.
+
+The largest body of formalized mathematics in Lean is **Mathlib**
+(https://leanprover-community.github.io/mathlib4_docs/), which
+contains over 200,000 theorems covering algebra, analysis, topology,
+number theory, combinatorics, and category theory.
 
 ## CS Track: Lean as a Programming Language
 
-Lean is a pure functional language with dependent types. It compiles to C
-and can be used for real software, not just proofs.
+Lean is a pure functional language with dependent types. It compiles
+to C via an intermediate representation and can be used for real
+software, not just proofs.
 
 ```lean
 def factorial : Nat -> Nat
@@ -199,6 +319,16 @@ def factorial : Nat -> Nat
 
 #eval factorial 10  -- 3628800
 ```
+
+Lean uses **reference counting** for memory management (not garbage
+collection). The compiler performs **destructive updates** when it
+detects a value has a reference count of 1, turning pure functional
+code into efficient in-place mutation. This is why `Array.push` on
+a uniquely-owned array is O(1), not O(n).
+
+**Reference:** Sebastian Ullrich and Leonardo de Moura, "Counting
+Immutable Beans: Reference Counting Optimized for Purely Functional
+Programming," IFL 2019.
 
 ## Lake: The Build System
 
@@ -210,4 +340,5 @@ cd my_project
 lake build
 ```
 
-This creates a project with `lakefile.lean` and a `Main.lean` entry point.
+This creates a project with `lakefile.lean` and a `Main.lean` entry
+point.
