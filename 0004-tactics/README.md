@@ -595,6 +595,68 @@ example : True /\ True /\ True := by
 
 ---
 
+## Category Theory Perspective
+
+**The tactic state as a morphism-building problem.** A proof state
+`Γ ⊢ G` — context `Γ`, goal `G` — is a request to construct a
+morphism `[[Γ]] → G` in the free cartesian closed category generated
+by the hypotheses. Each tactic transforms this into a
+sub-composition problem.
+
+| Tactic | Lambda calculus | Category theory |
+|--------|-----------------|-----------------|
+| `intro h` | `fun h =>` | Right adjunct (currying) |
+| `apply f` | `f ?_` (partial application) | Pre-composition with `f` |
+| `exact h` | identity | The identity morphism |
+| `constructor` | `And.intro _ _` | Universal property of product |
+| `left` / `right` | `Or.inl` / `Or.inr` | Coproduct injections |
+| `cases h` | `match h with` | Copairing (universal property of coproduct) |
+| `rfl` | `Eq.refl` | Diagonal `Δ : A → A × A` specialised to `=` |
+| `ext` | `funext` | Pointwise equality = no proper epimorphisms in **Set** |
+| `calc` | `Eq.trans` | Composition of morphisms |
+| `simp` | term rewriting | Congruence closure (quotient category) |
+
+**Cut elimination and normalization.** A **cut** in Gentzen's
+sequent calculus (1935) is the composition rule: from `Γ ⊢ A` and
+`Γ, A ⊢ B`, derive `Γ ⊢ B`. Categorically, a cut is composition of
+morphisms. Gentzen's **Hauptsatz** (cut-elimination theorem) says
+every cut can be removed, yielding an analytic proof. In type theory
+this is **normalization**: every proof term reduces to a beta-eta
+normal form. The categorical proof is that the free CCC has a
+decidable equality on morphisms, which follows from confluence and
+strong normalization of reduction.
+
+**The Yoneda lemma and `exact`.** The tactic `exact h` closes a
+goal `P` when `h : P` is in the context. This uses the **Yoneda
+embedding** principle: a type (object) is fully determined by its
+"incoming hom-sets". More directly, the **representability**
+viewpoint says that proving `P` is the same as producing a global
+element `⊤ → P`. The Yoneda lemma underpins `funext` and `ext`:
+two morphisms are equal iff they agree on all generalized elements.
+
+**Adjunctions and decision procedures.** Automated tactics like
+`omega` correspond to decidability of hom-sets in certain quotient
+categories. The theory of linear arithmetic (Presburger arithmetic)
+is the equational theory of ordered abelian groups; its hom-sets are
+decidable by the Omega algorithm (Pugh, 1992). `simp` implements
+**congruence closure**, computing the least congruence relation
+containing the given equations — this is the **quotient** of the
+term category by those equations. Decidability results in proof
+theory and category theory are two sides of the same coin.
+
+**Reference:** Seely, R.A.G. (1984). "Locally cartesian closed
+categories and type theory." *Mathematical Proceedings of the
+Cambridge Philosophical Society* 95. Establishes that dependent type
+theory is the internal language of locally cartesian closed
+categories.
+
+**Reference:** Gentzen, G. (1935). "Untersuchungen über das logische
+Schließen." *Mathematische Zeitschrift* 39. The original cut-
+elimination paper, whose categorical meaning was clarified by
+Lambek's work three decades later.
+
+---
+
 ## Math Track
 
 Tactic proofs mirror how mathematicians think: "assume P, then by

@@ -537,6 +537,78 @@ of a type follows algebraic rules:
 So `Maybe Bool = 1 + Bool = 1 + 2 = 3` values: `nothing`, `just true`,
 `just false`.
 
+## Category Theory Perspective
+
+**Inductive types as initial algebras.** For a polynomial
+endofunctor `F : Type → Type`, an **F-algebra** is a pair `(A, α)`
+where `α : F A → A` is the "folding" structure map. An inductive
+type is the **initial F-algebra**: it is the least fixed point `μF`
+of `F`, with a canonical structure map `in : F(μF) → μF`.
+Initiality means there is a **unique** F-algebra homomorphism from
+`(μF, in)` to any other F-algebra `(A, α)`. This unique morphism is
+the recursor (eliminator).
+
+| Inductive type | Functor `F(X)` | Algebra structure | Recursor |
+|----------------|----------------|-------------------|----------|
+| `MyNat` | `1 + X` | `[zero, succ] : 1 + Nat → Nat` | `Nat.rec` |
+| `MyList α` | `1 + α × X` | `[nil, cons]` | `List.foldr` |
+| `BTree α` | `1 + α × X × X` | `[leaf, node]` | tree fold |
+| `Maybe α` | `1 + α` | `[none, some]` | `Option.casesOn` |
+
+**Lambek's lemma.** For an initial algebra `(μF, in : F(μF) → μF)`,
+the structure map `in` is an **isomorphism**. This means
+`μF ≅ F(μF)`: the initial algebra is a fixed point of `F`. For
+`Nat`: `Nat ≅ 1 + Nat`. The two directions of this isomorphism are
+exactly the **constructor** (right-to-left) and **pattern match**
+(left-to-right). Pattern matching is Lambek's lemma applied in the
+direction `Nat → 1 + Nat`.
+
+**Catamorphisms.** The unique algebra homomorphism from the initial
+algebra to any other `F`-algebra is called a **catamorphism** (from
+κατά, "according to"). `Nat.rec` is the catamorphism for `Nat`;
+`List.foldr` is the catamorphism for `List`. Every structurally
+recursive function is a catamorphism. The categorical guarantee:
+since there is a *unique* such morphism, there is at most one
+well-typed way to define a structurally recursive function with
+given base and step cases.
+
+**Functoriality and natural transformations.** Type constructors
+like `List`, `Option`, and `Tree` are **functors** — endofunctors
+on **Type**. Their action on morphisms is `map`. The functor laws
+(`map id = id`, `map (g ∘ f) = map g ∘ map f`) state exactly that
+`map` preserves identity and composition. A polymorphic function
+`∀ A, F A → G A` satisfying naturality is a **natural
+transformation** `η : F ⟹ G`. For instance, `List.reverse` is a
+natural transformation from `List` to itself; `List.length` is a
+natural transformation from `List` to the constant functor `Nat`.
+
+**Indexed families as fibrations.** A family `B : A → Type` is a
+**fibration** over `A`. The total space `Σ x : A, B x` is the total
+category of the fibration; `A` is the base. The adjoint triple
+`Σ ⊣ const ⊣ Π` — existential quantification is left adjoint to
+weakening, universal quantification is right adjoint to weakening —
+is the fundamental structure of dependent type theory (Seely 1984,
+Jacobs 1999). Indexed inductive types like `Vector : Nat → Type`
+are fibrations over `Nat` whose fibers vary with the index.
+
+**W-types as universal polynomial functors.** The most general
+inductive types in type theory are **W-types** (well-founded trees):
+`W (A : Type) (B : A → Type)` represents a tree whose nodes carry
+labels in `A` with branching indexed by `B`. Every finitary
+inductive type can be encoded as a W-type. Categorically, W-types
+are initial algebras for **polynomial functors**
+`F(X) = Σ a : A, X^(B a)`, the most general class of functors
+definable from sums and exponentials.
+
+**Reference:** Meijer, E., Fokkinga, M., and Paterson, R. (1991).
+"Functional Programming with Bananas, Lenses, Envelopes and Barbed
+Wire." *FPCA '91, LNCS 523.* Systematic treatment of catamorphisms,
+anamorphisms, and the initial/terminal algebra duality.
+
+**Reference:** Jacobs, B. (1999). *Categorical Logic and Type
+Theory.* North-Holland. Chapter 9 covers fibrations and the
+categorical semantics of dependent types comprehensively.
+
 ## Historical Timeline
 
 | Year | System                  | Author(s)                   | Key idea                                |

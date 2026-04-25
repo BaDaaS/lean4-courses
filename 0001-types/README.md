@@ -281,6 +281,67 @@ Brouwer (1907), Arend Heyting (1930), and Andrey Kolmogorov (1932).
 It provides the constructive semantics that Lean's `Prop` universe
 implements (before `Classical.choice` is invoked).
 
+## Category Theory Perspective
+
+From a categorist's viewpoint, Lean's type theory is the **internal
+language** of a locally cartesian closed category (LCCC). Every
+type-theoretic construct has a precise categorical meaning.
+
+**Types as objects, functions as morphisms.** The collection of
+Lean types and functions between them forms a category **Type**.
+Objects are types; morphisms `f : A → B` are functions; composition
+is `fun x => f (g x)`; and the identity morphism on `A` is
+`fun x => x`. The category axioms — associativity of composition
+and unit laws for the identity — hold definitionally in Lean.
+
+**Products as categorical products.** The type `A × B` is a
+categorical **product**: it comes with projections
+`π₁ : A × B → A` and `π₂ : A × B → B` and satisfies the universal
+property that for any `C` with morphisms `f : C → A` and `g : C → B`
+there is a unique morphism `⟨f, g⟩ : C → A × B` with
+`π₁ ∘ ⟨f, g⟩ = f` and `π₂ ∘ ⟨f, g⟩ = g`. In Lean this is
+`Prod.mk`, `Prod.fst`, and `Prod.snd`.
+
+**Sum types as coproducts.** The type `Sum A B` is a categorical
+**coproduct**: it comes with injections `ι₁ : A → A ⊕ B` and
+`ι₂ : B → A ⊕ B`, and for any `C` with `f : A → C` and `g : B → C`
+there is a unique copairing `[f, g] : A ⊕ B → C`. In Lean the
+injections are `Sum.inl` and `Sum.inr`; the copairing is `match`.
+
+**Function types as exponential objects.** The type `A → B` is the
+**exponential** `B^A` in the cartesian closed category **Type**. The
+evaluation morphism `ev : (A → B) × A → B` is function application.
+The universal property (the adjunction `(− × A) ⊣ (A → −)`) is
+precisely currying: functions `C × A → B` correspond bijectively and
+naturally to functions `C → (A → B)`.
+
+**Universe hierarchy as Grothendieck universes.** The chain
+`Type 0 : Type 1 : Type 2 : ...` is a tower of Grothendieck
+universes. The impredicative universe `Prop` plays an analogous role
+to the **subobject classifier** in a topos: `P : Prop` classifies
+the "truth value" of a property, and proof irrelevance makes all
+proofs of `P` equal, just as a subobject classifier takes values in
+`{true, false}`.
+
+**Sigma types as dependent sums.** The Sigma type `(x : A) × B x`
+is the **dependent sum** (or comprehension) in a fibered category.
+It represents the total space of the family `B : A → Type`. The
+first projection gives the base and the second gives the fiber. This
+is the fundamental construction in the theory of **fibrations**
+(Grothendieck, 1960s): the family `B` is a fibration over `A`, and
+`Σ x, B x` is its total space.
+
+**Reference:** Lambek, J. and Scott, P.J. (1986). *Introduction to
+Higher Order Categorical Logic.* Cambridge University Press.
+Establishes the equivalence between cartesian closed categories,
+typed lambda calculi, and intuitionistic propositional logic.
+
+**Reference:** Jacobs, B. (1999). *Categorical Logic and Type
+Theory.* North-Holland. The definitive reference for categorical
+semantics of dependent type theory.
+
+---
+
 ## CS Track: Types as Specifications
 
 Types specify what data looks like and what functions accept/return.
