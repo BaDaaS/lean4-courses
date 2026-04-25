@@ -221,6 +221,51 @@ require libA from "." / "lib-a"
 require libB from "." / "lib-b"
 ```
 
+## Formatting and Linting
+
+As of 2025, Lean 4 has no official source code formatter (`lean fmt`
+does not exist). The tracking issue is
+[leanprover/lean4#1488](https://github.com/leanprover/lean4/issues/1488)
+(labeled P-high, still open). Lean 4 has an internal
+`PrettyPrinter/Formatter` module, but it is not yet suitable for
+reformatting source files. The main difficulty is Lean's user-extensible
+syntax: custom macros, notation, and DSLs mean a formatter must handle
+arbitrary parser extensions, not just a fixed grammar.
+
+### Third-party formatters
+
+- [lean-fmt](https://github.com/lotusirous/lean-fmt): a lightweight
+  Go-based tool for basic whitespace and indentation normalization.
+  Self-described as "a workaround until the official Lean formatter is
+  ready." Not a full semantic formatter.
+- [format_lean](https://github.com/leanprover-community/format_lean):
+  a Python tool from the Lean community, originally for Lean 3. Limited
+  Lean 4 support.
+
+### Linters
+
+- `lake build --wfail`: treats all warnings as errors. This is the
+  baseline for CI.
+- Batteries `runLinter`: the standard linter executable shipped with
+  Batteries. Projects can set `lintDriver` in their lakefile to use it.
+- Lean 4.22.0+ added a built-in simp argument cleanup linter.
+- Mathlib linters (`Mathlib.Tactic.Linter.Lint`): `simpNF`,
+  `docBlame`, `unusedArguments`, and more. Requires Mathlib as a
+  dependency.
+- `lint-style` (Mathlib/CSLib): text-based style checks for copyright
+  headers, line length, trailing whitespace.
+
+### What to use in CI today
+
+For projects without Mathlib, the practical setup is:
+
+```bash
+lake build --wfail    # Warnings as errors
+```
+
+There is no formatter to enforce. Consistent style must be maintained
+manually or via editor configuration.
+
 ## Best Practices
 
 1. Always pin lean-toolchain to an exact version
