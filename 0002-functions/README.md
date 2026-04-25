@@ -300,6 +300,69 @@ Function extensionality states that if `forall x, f x = g x`, then
 `f = g`. In Lean, this is a theorem (`funext`), not an axiom. It
 follows from `propext` and `Quot.sound`.
 
+## Category Theory Perspective
+
+**Functions as morphisms.** In the category **Type**, functions
+`f : A → B` are exactly the morphisms from `A` to `B`. Composition
+`g ∘ f` (written `fun x => g (f x)` in Lean) is categorical
+composition; `fun x => x` is the identity morphism. The laws —
+`f ∘ id = f`, `id ∘ f = f`, associativity — hold definitionally.
+
+**The cartesian closed structure and currying.** The bijection
+
+```
+Hom(A × B, C)  ≅  Hom(A, C^B)
+```
+
+is **natural** in `A`, `B`, and `C` — it is a natural isomorphism,
+not merely a set-theoretic correspondence. This naturality is the
+categorical content of currying. In Lean, `Function.curry` and
+`Function.uncurry` implement both directions of this isomorphism.
+
+**The exponential adjunction.** The bijection above is the
+unit/counit of an **adjunction**: `(− × B) ⊣ (B → −)`. The functor
+`− × B : Type → Type` (pair with `B`) is left adjoint to the
+functor `B → − : Type → Type` (function space from `B`). The unit
+`η_A : A → (B → A × B)` is `fun a b => (a, b)` and the counit
+`ε_C : (B → C) × B → C` is function application. Every adjunction
+generates a monad on the right-hand category — here the State monad
+`fun A => B → A × B` (see course 0007).
+
+**Higher-order functions and the endomorphism monoid.** For any
+type `A`, the set of functions `A → A` under composition forms a
+**monoid** (with identity `id`). `applyTwice f` computes `f² = f ∘ f`
+in this monoid. More generally, `applyTwice` maps the monoid of
+endomorphisms to itself by squaring — an endomorphism of the
+endomorphism monoid.
+
+**Functoriality.** The operation `map : (A → B) → List A → List B`
+is the **action of the List functor on morphisms**. The identity law
+`map id = id` and the composition law `map (g ∘ f) = map g ∘ map f`
+are precisely the **functor laws**. Every type constructor `F` in
+Lean that supports `map` is an endofunctor on **Type**. The
+`Functor` typeclass (see course 0006) captures this structure
+formally.
+
+**Natural transformations.** A polymorphic function
+`∀ A, F A → G A` for two type constructors `F` and `G` is a
+**natural transformation** `η : F ⟹ G` when it commutes with `map`:
+`G (map f) ∘ η_A = η_B ∘ F (map f)` for every `f : A → B`.
+Parametrically polymorphic functions (using only `{A : Type}` with
+no typeclass constraints) are **automatically natural** by
+parametricity — a deep result due to Reynolds (1983) and Wadler
+(1989) that connects program polymorphism to categorical naturality.
+
+**Reference:** Mac Lane, S. (1971). *Categories for the Working
+Mathematician.* Springer. Chapter IV covers adjunctions; Chapter VII
+covers monads.
+
+**Reference:** Reynolds, J.C. (1983). "Types, Abstraction and
+Parametric Polymorphism." *Information Processing 83*, IFIP
+TC 2 Working Conference. The original parametricity paper, showing
+that polymorphic types force natural transformations.
+
+---
+
 ## CS Track: Functions as Computations
 
 Functions in Lean are pure (no side effects). They always return

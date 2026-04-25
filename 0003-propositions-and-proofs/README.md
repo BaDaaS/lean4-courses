@@ -389,6 +389,77 @@ logische Schliessen." Mathematische Zeitschrift. This paper
 introduced natural deduction and the sequent calculus, the logical
 systems that the Curry-Howard correspondence maps to type theory.
 
+## Category Theory Perspective
+
+**The Curry-Howard-Lambek correspondence.** The Curry-Howard
+correspondence has a third vertex, discovered by Joachim Lambek
+(1969): there is a precise triangle of equivalences between
+
+1. **Intuitionistic propositional logic** (natural deduction)
+2. **Simply typed lambda calculus** (type theory)
+3. **Bicartesian closed categories** (category theory)
+
+Every logical connective corresponds to categorical structure. This
+is not an analogy — it is a theorem about equivalent presentations
+of the same mathematical object.
+
+| Logic | Type theory | Category theory |
+|-------|-------------|-----------------|
+| Proposition `P` | Type `P : Prop` | Object |
+| Proof `h : P` | Term `h : P` | Morphism `⊤ → P` |
+| Implication `P → Q` | Function type `P → Q` | Internal hom (exponential `Q^P`) |
+| Conjunction `P ∧ Q` | Product type `P × Q` | Categorical product |
+| Disjunction `P ∨ Q` | Sum type `P ⊕ Q` | Categorical coproduct |
+| `True` | Unit type `⊤` | Terminal object `1` |
+| `False` | Empty type `⊥` | Initial object `0` |
+| `∀ x : A, P x` | Dependent function type `Π` | Right adjoint to pullback |
+| `∃ x : A, P x` | Dependent pair type `Σ` | Left adjoint to pullback |
+
+**Propositions form a Heyting algebra.** The logical connectives
+`∧`, `∨`, `→`, `⊤`, `⊥` on `Prop` make `Prop` into a **Heyting
+algebra** — a distributive lattice with an implication satisfying
+`a ∧ b ≤ c  ⟺  a ≤ b → c`. This is exactly the adjunction
+`(− ∧ B) ⊣ (B → −)` in the category of propositions. A Heyting
+algebra is the same as a **cartesian closed poset**: a poset viewed
+as a category (with at most one morphism between any two objects)
+that is also cartesian closed.
+
+**Negation as internal hom into the initial object.** In a Heyting
+algebra, `¬P = P → ⊥`. This is the definition Lean uses:
+`Not P = P → False`. Categorically, negation is the internal hom
+into the initial object `0`. In a **Boolean algebra** (a Heyting
+algebra where `¬¬a = a` for all `a`), double negation elimination
+holds. `Prop` with `Classical.em` is Boolean; without it, it is
+merely a Heyting algebra — the difference between classical and
+intuitionistic logic, made precise by the categorical framework.
+
+**The existential as a left adjoint.** Quantifiers are adjoints to
+the substitution (weakening) functor. For a predicate family
+`B : A → Prop`, the operation `∃ x : A, B x` is the **left adjoint**
+to weakening and `∀ x : A, B x` is the **right adjoint**. The
+Beck-Chevalley condition — that quantification commutes with
+substitution along commuting squares — holds in Lean's type theory
+and is the categorical counterpart of the substitution lemma in
+formal logic.
+
+**The internal language.** A sequent `h₁ : P₁, ..., hₙ : Pₙ ⊢ Q`
+corresponds to a morphism `P₁ × ... × Pₙ → Q` in the category of
+propositions. Natural deduction proofs are exactly terms of the
+**internal lambda calculus** of the category. Lean's term-mode
+proofs write these morphisms down explicitly; tactic-mode proofs
+build them interactively.
+
+**Reference:** Lambek, J. (1969). "Deductive systems and categories
+II." *Lecture Notes in Mathematics* 86. Springer. The original paper
+establishing the categorical leg of the Curry-Howard-Lambek
+correspondence.
+
+**Reference:** Awodey, S. (2010). *Category Theory.* Oxford
+University Press. Chapter 9 covers the categorical semantics of
+logic and type theory accessibly; Chapter 8 covers adjoints.
+
+---
+
 ## Math Track
 
 This is the foundation of formal mathematics. Every theorem in
