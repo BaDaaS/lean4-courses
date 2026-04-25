@@ -17,7 +17,7 @@ then use that result to do Z". But the details vary:
 
 ## Option as a Monad
 
-```lean
+```lean fromFile:Examples.lean#option_monad
 def safeDivide (a b : Nat) : Option Nat :=
   if b == 0 then none else some (a / b)
 
@@ -38,9 +38,9 @@ def computation' : Option Nat := do
 
 ## The Monad Typeclass
 
-```lean
+```lean fromFile:Examples.lean#monad_typeclass
 -- Simplified definition (actual one is more general)
-class Monad (m : Type -> Type) where
+class MyMonad (m : Type -> Type) where
   pure : alpha -> m alpha           -- wrap a value
   bind : m alpha -> (alpha -> m beta) -> m beta  -- sequence
 ```
@@ -50,32 +50,32 @@ class Monad (m : Type -> Type) where
 
 ## Do-Notation Translation
 
-```lean
+```lean fromFile:Examples.lean#do_notation_translation
 -- This:
-do
-  let x <- action1
-  let y <- action2 x
-  return f x y
-
+-- do
+--   let x <- action1
+--   let y <- action2 x
+--   return f x y
+--
 -- Desugars to:
-action1 >>= fun x =>
-action2 x >>= fun y =>
-pure (f x y)
+-- action1 >>= fun x =>
+-- action2 x >>= fun y =>
+-- pure (f x y)
 ```
 
 ## IO Monad
 
 IO is the monad for side effects:
 
-```lean
+```lean fromFile:Examples.lean#io_monad
 def main : IO Unit := do
   let name <- IO.getStdin >>= fun stdin => stdin.getLine
-  IO.println s!"Hello, {name.trim}!"
+  IO.println s!"Hello, {name.trimAscii}!"
 ```
 
 ## Except Monad (Error Handling)
 
-```lean
+```lean fromFile:Examples.lean#except_monad
 def parseInt (s : String) : Except String Int :=
   match s.toInt? with
   | some n => .ok n

@@ -1,13 +1,14 @@
-# 0011 - Lists and Data Structures
+/-
+# 0011 - Lists and Data Structures Examples
 
-## Goal
+Code examples from the README, wrapped in anchors for injection.
+-/
 
-Work with lists and other functional data structures. Prove properties
-about list operations using induction.
+import Std
 
-## List Basics
+namespace Course0011Examples
 
-```lean fromFile:Examples.lean#list_basics
+-- #anchor: list_basics
 -- List is defined as:
 -- inductive List (alpha : Type) where
 --   | nil : List alpha
@@ -21,47 +22,29 @@ about list operations using induction.
 #eval [1, 2, 3] ++ [4, 5]         -- [1, 2, 3, 4, 5]
 #eval [1, 2, 3].reverse            -- [3, 2, 1]
 #eval [1, 2, 3].length             -- 3
-```
+-- #end
 
-## Proving List Properties
-
-```lean fromFile:Examples.lean#map_id_proof
+-- #anchor: map_id_proof
 theorem map_id {alpha : Type} (xs : List alpha) : xs.map id = xs := by
   induction xs with
   | nil => rfl
   | cons x xs ih => simp [List.map, ih]
-```
+-- #end
 
-## Other Data Structures
-
-### Array (efficient random access)
-
-```lean fromFile:Examples.lean#array_basics
+-- #anchor: array_basics
 def arr : Array Nat := #[1, 2, 3, 4, 5]
 #eval arr[2]       -- 3
 #eval arr.size     -- 5
 #eval arr.push 6   -- #[1, 2, 3, 4, 5, 6]
-```
+-- #end
 
-### HashMap
-
-```lean fromFile:Examples.lean#hashmap_basics
+-- #anchor: hashmap_basics
 def m : Std.HashMap String Nat :=
   let h : Std.HashMap String Nat := {}
   let h := h.insert "alice" 30
   h.insert "bob" 25
 
 #eval m["alice"]?  -- some 30
-```
+-- #end
 
-## Math Track
-
-Lists model finite sequences. Properties like associativity of append,
-length preservation under map, and commutativity of certain operations
-are proved by structural induction on the list.
-
-## CS Track
-
-Lists are the fundamental functional data structure. While Arrays
-provide O(1) access, Lists provide O(1) cons and pattern matching.
-Choose based on access patterns.
+end Course0011Examples

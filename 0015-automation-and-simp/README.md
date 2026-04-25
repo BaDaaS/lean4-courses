@@ -10,7 +10,7 @@ write custom simp lemmas.
 `simp` applies a database of `@[simp]` lemmas repeatedly until no more
 apply:
 
-```lean
+```lean fromFile:Examples.lean#simp_basics
 example (xs : List Nat) : xs ++ [] = xs := by simp
 example (n : Nat) : n + 0 = n := by simp
 example (n : Nat) : 0 + n = n := by simp
@@ -20,14 +20,16 @@ example (n : Nat) : 0 + n = n := by simp
 
 Restrict to specific lemmas:
 
-```lean
-example (h : a = b) : a + c = b + c := by
+```lean fromFile:Examples.lean#simp_only
+example (a b c : Nat) (h : a = b) : a + c = b + c := by
   simp only [h]
 ```
 
 ### Adding simp lemmas
 
-```lean
+```lean fromFile:Examples.lean#adding_simp_lemmas
+def double (n : Nat) : Nat := 2 * n
+
 @[simp]
 theorem double_def (n : Nat) : double n = 2 * n := rfl
 
@@ -38,7 +40,7 @@ theorem double_def (n : Nat) : double n = 2 * n := rfl
 
 Solves linear arithmetic over Nat and Int:
 
-```lean
+```lean fromFile:Examples.lean#omega_examples
 example (n m : Nat) (h : n < m) : n + 1 <= m := by omega
 example (a b : Int) (h1 : a > 0) (h2 : b > 0) : a + b > 0 := by omega
 ```
@@ -47,9 +49,15 @@ example (a b : Int) (h1 : a > 0) (h2 : b > 0) : a + b > 0 := by omega
 
 Evaluates decidable propositions:
 
-```lean
+```lean fromFile:Examples.lean#decide_examples
 example : 2 + 2 = 4 := by decide
-example : Nat.Prime 7 := by decide
+```
+
+`Nat.Prime` requires Mathlib:
+
+```lean
+-- Requires Mathlib
+-- example : Nat.Prime 7 := by decide
 ```
 
 ## norm_num
@@ -72,14 +80,18 @@ example (x y : Int) : (x + y) ^ 2 = x ^ 2 + 2 * x * y + y ^ 2 := by
 
 ## Combining Tactics
 
-```lean
+```lean fromFile:Examples.lean#combining_tactics
 -- simp then omega for the remainder
 example (n : Nat) (h : n > 0) : n - 1 + 1 = n := by
   omega
+```
 
--- field_simp to clear denominators, then ring
-example (x : Float) (h : x != 0) : x / x = 1 := by
-  sorry -- need field_simp from Mathlib
+Clearing denominators with `field_simp` requires Mathlib:
+
+```lean
+-- Requires Mathlib
+-- example (x : Rat) (h : x != 0) : x / x = 1 := by
+--   field_simp
 ```
 
 ## Math Track

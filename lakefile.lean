@@ -36,76 +36,108 @@ lean_lib Course0005 where
 
 lean_lib Course0006 where
   srcDir := "0006-structures-and-typeclasses"
-  roots := #[`Solutions]
+  roots := #[`Solutions, `Examples]
 
 lean_lib Course0007 where
   srcDir := "0007-monads-and-do-notation"
-  roots := #[`Solutions]
+  roots := #[`Solutions, `Examples]
 
 lean_lib Course0008 where
   srcDir := "0008-pattern-matching-and-recursion"
-  roots := #[`Solutions]
+  roots := #[`Solutions, `Examples]
 
 lean_lib Course0009 where
   srcDir := "0009-dependent-types"
-  roots := #[`Solutions]
+  roots := #[`Solutions, `Examples]
 
 lean_lib Course0010 where
   srcDir := "0010-natural-numbers-and-induction"
-  roots := #[`Solutions]
+  roots := #[`Solutions, `Examples]
 
 lean_lib Course0011 where
   srcDir := "0011-lists-and-data-structures"
-  roots := #[`Solutions]
+  roots := #[`Solutions, `Examples]
 
 lean_lib Course0012 where
   srcDir := "0012-finite-types-and-decidability"
-  roots := #[`Solutions]
+  roots := #[`Solutions, `Examples]
 
 lean_lib Course0013 where
   srcDir := "0013-algebraic-structures"
-  roots := #[`Solutions]
+  roots := #[`Solutions, `Examples]
 
 lean_lib Course0014 where
   srcDir := "0014-basic-number-theory"
-  roots := #[`Solutions]
+  roots := #[`Solutions, `Examples]
 
 lean_lib Course0015 where
   srcDir := "0015-automation-and-simp"
-  roots := #[`Solutions]
+  roots := #[`Solutions, `Examples]
+
+lean_lib Course0016 where
+  srcDir := "0016-metaprogramming-intro"
+  roots := #[`Solutions, `Examples]
 
 lean_lib Course0017 where
   srcDir := "0017-projects"
   roots := #[`Solutions]
 
+lean_lib Course0018 where
+  srcDir := "0018-io-and-system-programming"
+  roots := #[`Solutions, `Examples]
+
 lean_lib Course0019 where
   srcDir := "0019-lakefile-and-lake"
-  roots := #[`Solutions]
+  roots := #[`Solutions, `Examples]
+
+lean_lib Course0020 where
+  srcDir := "0020-compiled-programs"
+  roots := #[`Solutions, `Examples]
+
+lean_lib Course0021 where
+  srcDir := "0021-ffi-and-c-interop"
+  roots := #[`Solutions, `Examples]
+
+lean_lib Course0022 where
+  srcDir := "0022-concurrency-and-tasks"
+  roots := #[`Solutions, `Examples]
+
+lean_lib Course0023 where
+  srcDir := "0023-file-io-and-cli"
+  roots := #[`Solutions, `Examples]
+
+lean_lib Course0024 where
+  srcDir := "0024-performance-and-compilation"
+  roots := #[`Solutions, `Examples]
 
 lean_lib Course0025 where
   srcDir := "0025-contributing-to-mathlib"
-  roots := #[`Solutions]
+  roots := #[`Solutions, `Examples]
 
 lean_lib Course0026 where
   srcDir := "0026-contributing-to-cslib"
-  roots := #[`Solutions]
+  roots := #[`Solutions, `Examples]
 
 lean_lib Course0027 where
   srcDir := "0027-contributing-to-arklib"
-  roots := #[`Solutions]
+  roots := #[`Solutions, `Examples]
 
 lean_lib Course0028 where
   srcDir := "0028-lean-internals"
-  roots := #[`Solutions]
+  roots := #[`Solutions, `Examples]
 
 lean_lib Course0029 where
   srcDir := "0029-elaboration-and-unification"
-  roots := #[`Solutions]
+  roots := #[`Solutions, `Examples]
 
 lean_lib Course0030 where
   srcDir := "0030-advanced-metaprogramming"
-  roots := #[`Solutions]
+  roots := #[`Solutions, `Examples]
 
 lean_lib Course0031 where
   srcDir := "0031-type-theory-foundations"
-  roots := #[`Solutions]
+  roots := #[`Solutions, `Examples]
+
+lean_lib StandaloneSolutions where
+  srcDir := "Solutions"
+  roots := #[`S0010, `S0011, `S0014]

@@ -10,7 +10,7 @@ most powerful feature, enabling precise specifications and verified code.
 A dependent type is a type that mentions a value. The type can change
 depending on the value:
 
-```lean
+```lean fromFile:Examples.lean#vec_inductive
 -- Vector: a list with its length in the type
 inductive Vec (alpha : Type) : Nat -> Type where
   | nil : Vec alpha 0
@@ -24,22 +24,22 @@ knows the length at type-checking time.
 
 A function whose return type depends on the input value:
 
-```lean
+```lean fromFile:Examples.lean#dependent_function_types
 -- The return type depends on the Bool value
-def boolToType (b : Bool) : Type :=
-  if b then Nat else String
+def boolToType : Bool -> Type
+  | true  => Nat
+  | false => String
 
-def getValue (b : Bool) : boolToType b :=
-  match b with
-  | true  => 42        -- Nat
-  | false => "hello"   -- String
+def getValue : (b : Bool) -> boolToType b
+  | true  => (42 : Nat)
+  | false => "hello"
 ```
 
 ## Sigma Types (Dependent Pairs)
 
 A pair where the type of the second element depends on the first:
 
-```lean
+```lean fromFile:Examples.lean#sigma_types
 -- A number together with a proof it is positive
 def posNum : { n : Nat // n > 0 } :=
   ⟨5, by omega⟩
@@ -51,9 +51,9 @@ def posNum : { n : Nat // n > 0 } :=
 
 `Fin n` is the type of natural numbers less than n:
 
-```lean
+```lean fromFile:Examples.lean#fin_bounded
 -- Fin 3 has exactly three values: 0, 1, 2
-def safeIndex (xs : List alpha) (i : Fin xs.length) : alpha :=
+def safeIndex {alpha : Type} (xs : List alpha) (i : Fin xs.length) : alpha :=
   xs[i]
 
 -- This cannot go out of bounds!
@@ -61,14 +61,14 @@ def safeIndex (xs : List alpha) (i : Fin xs.length) : alpha :=
 
 ## Propositions as Types in Practice
 
-```lean
+```lean fromFile:Examples.lean#propositions_as_types
 -- A function that takes a proof the list is non-empty
-def head! (xs : List alpha) (h : xs.length > 0) : alpha :=
+def head! {alpha : Type} (xs : List alpha) (h : xs.length > 0) : alpha :=
   match xs, h with
   | x :: _, _ => x
 
 -- Usage requires providing the proof
-example : head! [1, 2, 3] (by omega) = 1 := rfl
+example : head! [1, 2, 3] (by simp) = 1 := rfl
 ```
 
 ## Math Track: Pi and Sigma Types

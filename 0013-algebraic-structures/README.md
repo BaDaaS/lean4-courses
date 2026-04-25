@@ -9,7 +9,7 @@ using typeclasses. Introduction to Mathlib's hierarchy.
 
 A monoid is a set with an associative binary operation and an identity:
 
-```lean
+```lean fromFile:Examples.lean#monoid
 class MyMonoid (M : Type) where
   one : M
   mul : M -> M -> M
@@ -22,7 +22,7 @@ class MyMonoid (M : Type) where
 
 A group adds inverses:
 
-```lean
+```lean fromFile:Examples.lean#group
 class MyGroup (G : Type) extends MyMonoid G where
   inv : G -> G
   mul_inv : forall a : G, mul a (inv a) = one
@@ -33,7 +33,7 @@ class MyGroup (G : Type) extends MyMonoid G where
 A ring has addition (abelian group) and multiplication (monoid) with
 distributivity:
 
-```lean
+```lean fromFile:Examples.lean#ring
 -- Simplified
 class MyRing (R : Type) where
   zero : R

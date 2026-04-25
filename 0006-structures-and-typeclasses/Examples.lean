@@ -1,16 +1,12 @@
-# 0006 - Structures and Typeclasses
+/-
+# 0006 - Structures and Typeclasses Examples
 
-## Goal
+Code examples from the README, wrapped in anchors for injection.
+-/
 
-Learn structures (named product types with fields) and typeclasses
-(interfaces for ad-hoc polymorphism). These are how Lean models algebraic
-structures and achieves polymorphism.
+namespace Course0006Examples
 
-## Structures
-
-A structure is a named product type with named fields:
-
-```lean fromFile:Examples.lean#point_structure
+-- #anchor: point_structure
 structure Point where
   x : Float
   y : Float
@@ -23,11 +19,9 @@ def p : Point := { x := 3.0, y := 4.0 }
 
 -- Functional update
 def shifted := { p with x := p.x + 1.0 }
-```
+-- #end
 
-## Structures with Default Values
-
-```lean fromFile:Examples.lean#config_defaults
+-- #anchor: config_defaults
 structure Config where
   verbose : Bool := false
   maxRetries : Nat := 3
@@ -35,13 +29,9 @@ structure Config where
 
 def myConfig : Config := { verbose := true }
 -- maxRetries = 3, timeout = 30 (defaults)
-```
+-- #end
 
-## Typeclasses
-
-Typeclasses are structures with instance resolution:
-
-```lean fromFile:Examples.lean#typeclasses
+-- #anchor: typeclasses
 class Printable (alpha : Type) where
   print : alpha -> String
 
@@ -57,11 +47,9 @@ def display [Printable alpha] (x : alpha) : String :=
 
 #eval display 42      -- "42"
 #eval display true    -- "yes"
-```
+-- #end
 
-## Common Built-in Typeclasses
-
-```lean fromFile:Examples.lean#builtin_typeclasses
+-- #anchor: builtin_typeclasses
 -- ToString: convert to string
 instance : ToString Point where
   toString p := s!"({p.x}, {p.y})"
@@ -77,24 +65,18 @@ instance : Repr Point where
 -- Inhabited: has a default value
 instance : Inhabited Point where
   default := { x := 0.0, y := 0.0 }
-```
+-- #end
 
-## Extending Structures
-
-```lean fromFile:Examples.lean#extending_structures
+-- #anchor: extending_structures
 structure ColorPoint extends Point where
   color : String
 
 def cp : ColorPoint := { x := 1.0, y := 2.0, color := "red" }
 #eval cp.x      -- inherits from Point
 #eval cp.color
-```
+-- #end
 
-## Math Track: Algebraic Structures
-
-Typeclasses model algebraic structures perfectly:
-
-```lean fromFile:Examples.lean#algebraic_structures
+-- #anchor: algebraic_structures
 class MyGroup (G : Type) where
   e : G                       -- identity
   mul : G -> G -> G           -- group operation
@@ -102,14 +84,6 @@ class MyGroup (G : Type) where
   mul_assoc : forall a b c, mul (mul a b) c = mul a (mul b c)
   mul_e : forall a, mul a e = a
   mul_inv : forall a, mul a (inv a) = e
-```
+-- #end
 
-Mathlib uses this pattern extensively with classes like `Group`,
-`Ring`, `Field`, `Module`, etc.
-
-## CS Track: Interfaces and Polymorphism
-
-Typeclasses are like interfaces in Java/Go or traits in Rust. They let
-you write generic code that works for any type implementing the interface.
-The key difference: instance resolution is automatic (no explicit vtable
-or impl block needed at call sites).
+end Course0006Examples

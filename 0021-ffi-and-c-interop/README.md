@@ -9,7 +9,7 @@ the Foreign Function Interface for systems-level programming.
 
 ### Declaring External Functions
 
-```lean
+```lean fromFile:Examples.lean#extern_declaration
 -- Declare a C function
 @[extern "lean_my_c_add"]
 opaque myAdd (a b : UInt32) : UInt32
@@ -74,7 +74,7 @@ LEAN_EXPORT lean_obj_res lean_greeting(lean_obj_arg name) {
 
 Wrap C resources (file handles, sockets, etc.) in opaque Lean types:
 
-```lean
+```lean fromFile:Examples.lean#opaque_types
 opaque SocketHandle : NonemptyType
 def Socket := SocketHandle.type
 

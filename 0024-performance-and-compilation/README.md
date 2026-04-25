@@ -24,9 +24,9 @@ Lean uses reference counting (not garbage collection):
 - When count reaches 0, object is freed immediately
 - Destructive updates are free when refcount = 1
 
-```lean
+```lean fromFile:Examples.lean#reference_counting
 -- This is efficient: if xs has refcount 1, the push mutates in-place
-def appendMany (xs : Array Nat) (n : Nat) : Array Nat := do
+def appendMany (xs : Array Nat) (n : Nat) : Array Nat := Id.run do
   let mut arr := xs
   for i in List.range n do
     arr := arr.push i
@@ -50,7 +50,7 @@ pattern matching and recursion.
 
 Lean optimizes tail calls:
 
-```lean
+```lean fromFile:Examples.lean#tail_recursion
 -- Not tail recursive (stack overflow on large n)
 def sumBad : Nat -> Nat
   | 0 => 0
@@ -78,7 +78,7 @@ Use `UInt32`/`UInt64` for performance-critical numeric code.
 
 ## @[inline] and @[specialize]
 
-```lean
+```lean fromFile:Examples.lean#inline_and_specialize
 -- Force inlining
 @[inline]
 def myAdd (a b : Nat) : Nat := a + b
@@ -93,7 +93,7 @@ def myMap {alpha beta : Type} (f : alpha -> beta) :
 
 ## Benchmarking
 
-```lean
+```lean fromFile:Examples.lean#benchmarking
 def benchmark (label : String) (action : IO Unit) : IO Unit := do
   let start <- IO.monoMsNow
   action
@@ -105,7 +105,7 @@ def benchmark (label : String) (action : IO Unit) : IO Unit := do
 
 Provide an optimized implementation for a definition used in proofs:
 
-```lean
+```lean fromFile:Examples.lean#implemented_by
 -- Specification (for proofs)
 def slowFib : Nat -> Nat
   | 0 => 0
@@ -120,7 +120,7 @@ where
     | 0, a, _ => a
     | n + 1, a, b => go n b (a + b)
 
-@[implementedBy fastFibImpl]
+@[implemented_by fastFibImpl]
 def fib : Nat -> Nat := slowFib
 ```
 

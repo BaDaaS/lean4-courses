@@ -25,7 +25,7 @@ theorem dvd_add {a b c : Nat} (hab : a ∣ b) (hac : a ∣ c) :
     a ∣ (b + c) := by
   obtain ⟨k1, hk1⟩ := hab
   obtain ⟨k2, hk2⟩ := hac
-  exact ⟨k1 + k2, by subst hk1; subst hk2; exact Nat.left_distrib a k1 k2⟩
+  exact ⟨k1 + k2, by subst hk1; subst hk2; exact (Nat.left_distrib a k1 k2).symm⟩
 
 -- Exercise 6
 def myGcd (a b : Nat) : Nat :=
@@ -38,18 +38,17 @@ termination_by b
 -- Exercise 7
 theorem six_dvd_twelve : 6 ∣ 12 := ⟨2, rfl⟩
 
--- Exercise 8: Simple primality check using fuel-based recursion
-def isPrimeCheck (n : Nat) : Bool :=
-  if n < 2 then false
-  else go n 2
-where
-  go (n d : Nat) : Bool :=
+-- Exercise 8: Simple primality check (fuel-based)
+def isPrimeHelper : Nat -> Nat -> Nat -> Bool
+  | _, _, 0 => true
+  | n, d, fuel + 1 =>
     if d * d > n then true
     else if n % d == 0 then false
-    else go n (d + 1)
-  decreasing_by
-    simp_all [Nat.not_lt]
-    omega
+    else isPrimeHelper n (d + 1) fuel
+
+def isPrimeCheck (n : Nat) : Bool :=
+  if n < 2 then false
+  else isPrimeHelper n 2 n
 
 #eval isPrimeCheck 2    -- true
 #eval isPrimeCheck 7    -- true

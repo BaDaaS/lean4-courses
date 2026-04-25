@@ -48,7 +48,7 @@ The kernel checks:
 
 Lean's kernel has very few axioms:
 
-```lean
+```lean fromFile:Examples.lean#print_axioms_choice
 #print axioms Classical.choice
 -- Classical.choice, propext, Quot.sound
 ```
@@ -125,7 +125,7 @@ Lean's compiler pipeline:
 In compiled code, proofs and types are erased. Only computationally
 relevant terms remain:
 
-```lean
+```lean fromFile:Examples.lean#safe_div
 -- The proof h is erased at runtime
 def safeDiv (a b : Nat) (h : b > 0) : Nat := a / b
 -- Compiles to just: a / b
@@ -176,9 +176,9 @@ name is registered in the environment.
 **`abbrev`** creates a `defnDecl` with the `@[reducible]` attribute.
 The elaborator and `simp` always unfold it. Use for type aliases:
 
-```lean
-abbrev Point := Nat x Nat
--- The kernel always sees Nat x Nat, never Point
+```lean fromFile:Examples.lean#abbrev_point
+abbrev Point := Nat × Nat
+-- The kernel always sees Nat × Nat, never Point
 ```
 
 **`opaque`** creates an `opaqueDecl`. The body exists (so the

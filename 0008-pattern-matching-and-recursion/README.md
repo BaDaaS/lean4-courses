@@ -9,7 +9,7 @@ functions. Understand Lean's termination checker.
 
 ### Basic Matching
 
-```lean
+```lean fromFile:Examples.lean#basic_matching
 def describe : Nat -> String
   | 0 => "zero"
   | 1 => "one"
@@ -18,16 +18,17 @@ def describe : Nat -> String
 
 ### Nested Patterns
 
-```lean
-def firstTwo : List alpha -> Option (alpha x alpha)
+```lean fromFile:Examples.lean#nested_patterns
+def firstTwo {alpha : Type} : List alpha -> Option (alpha × alpha)
   | a :: b :: _ => some (a, b)
   | _           => none
 ```
 
 ### Multiple Discriminants
 
-```lean
-def zip : List alpha -> List beta -> List (alpha x beta)
+```lean fromFile:Examples.lean#multiple_discriminants
+def zip {alpha : Type} {beta : Type} :
+    List alpha -> List beta -> List (alpha × beta)
   | a :: as, b :: bs => (a, b) :: zip as bs
   | _, _ => []
 ```
@@ -37,7 +38,7 @@ def zip : List alpha -> List beta -> List (alpha x beta)
 Lean requires all functions to terminate. It checks that recursive calls
 are on structurally smaller arguments:
 
-```lean
+```lean fromFile:Examples.lean#factorial
 -- Lean accepts this: n is structurally smaller than n + 1
 def factorial : Nat -> Nat
   | 0     => 1
@@ -48,19 +49,20 @@ def factorial : Nat -> Nat
 
 Use `termination_by` to tell Lean what decreases:
 
-```lean
+```lean fromFile:Examples.lean#gcd_termination
 def gcd (a b : Nat) : Nat :=
   if b == 0 then a
   else gcd b (a % b)
 termination_by b
 decreasing_by
-  simp_all
-  omega
+  rename_i h
+  simp [beq_iff_eq] at h
+  exact Nat.mod_lt a (Nat.pos_of_ne_zero h)
 ```
 
 ### Mutual Recursion
 
-```lean
+```lean fromFile:Examples.lean#mutual_recursion
 mutual
   def isEven : Nat -> Bool
     | 0     => true

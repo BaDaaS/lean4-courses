@@ -110,7 +110,7 @@ lake update             # Update dependencies
 
 ## Command-Line Arguments
 
-```lean
+```lean fromFile:Examples.lean#command_line_arguments
 def main (args : List String) : IO Unit := do
   match args with
   | ["--help"] => IO.println "Usage: myapp [options]"

@@ -1,28 +1,14 @@
-# 0029 - Advanced Metaprogramming
+import Lean
 
-## Goal
+/-
+# 0030 - Advanced Metaprogramming Examples
 
-Write custom tactics, elaborators, and code generators. Understand
-the MetaM, TacticM, and TermElabM monads.
+Code examples from the README, wrapped in anchors for injection.
+-/
 
-## The Monad Stack
+namespace Course0030Examples
 
-```
-CoreM       -- names, environment, options
-  |
-  v
-MetaM       -- metavariables, unification, type checking
-  |
-  v
-TermElabM   -- term elaboration
-  |
-  v
-TacticM     -- tactic state (goals, hypotheses)
-```
-
-## MetaM: The Metaprogramming Monad
-
-```lean fromFile:Examples.lean#metam_basics
+-- #anchor: metam_basics
 open Lean Meta
 
 -- Check if two expressions are definitionally equal
@@ -36,11 +22,9 @@ def myInferType (e : Expr) : MetaM Expr :=
 -- Create a fresh metavariable
 def myMkFreshMVar (type : Expr) : MetaM Expr :=
   mkFreshExprMVar type
-```
+-- #end
 
-## Building Expressions
-
-```lean fromFile:Examples.lean#building_expressions
+-- #anchor: building_expressions
 open Lean
 
 -- Build the expression `Nat.add 2 3`
@@ -48,11 +32,9 @@ def mkAddExpr : MetaM Expr := do
   let two := mkNatLit 2
   let three := mkNatLit 3
   mkAppM ``Nat.add #[two, three]
-```
+-- #end
 
-## Custom Tactics
-
-```lean fromFile:Examples.lean#custom_tactic_my_rfl
+-- #anchor: custom_tactic_my_rfl
 open Lean Elab Tactic
 
 -- A tactic that closes goals of the form `n = n`
@@ -70,11 +52,9 @@ elab "my_rfl" : tactic => do
     | _ => throwTacticEx `my_rfl goal "not an equality"
 
 example : 2 + 2 = 4 := by my_rfl
-```
+-- #end
 
-## Syntax and Macros (Revisited, Deeper)
-
-```lean fromFile:Examples.lean#syntax_and_macros
+-- #anchor: syntax_and_macros
 -- Declare new syntax category
 declare_syntax_cat myExpr
 syntax num : myExpr
@@ -92,38 +72,30 @@ macro_rules
   | `([myExpr| ($e)]) => `([myExpr| $e])
 
 #eval [myExpr| (2 + 3) * 4]  -- 20
-```
+-- #end
 
-## Term Elaborators
-
-```lean fromFile:Examples.lean#term_elaborator
+-- #anchor: term_elaborator
 -- Custom term elaborator
 elab "natOfBool " b:term : term => do
   let bExpr <- Lean.Elab.Term.elabTerm b (some (mkConst ``Bool))
   return mkApp (mkConst ``Bool.toNat) bExpr
-```
+-- #end
 
-## Inspecting the Environment
-
-```lean fromFile:Examples.lean#inspecting_environment
+-- #anchor: inspecting_environment
 -- Get all declarations in the environment
 def listDecls : MetaM (Array Name) := do
   let env <- getEnv
   let pairs := env.constants.toList
   return pairs.toArray.map fun (name, _) => name
-```
+-- #end
 
-## Attribute Handlers
-
-```lean fromFile:Examples.lean#attribute_handler
+-- #anchor: attribute_handler
 -- Register a custom attribute
 initialize myAttr : TagAttribute <-
   registerTagAttribute `myTag "My custom attribute" fun _ _ => pure ()
-```
+-- #end
 
-## Writing a Linter
-
-```lean fromFile:Examples.lean#doc_linter
+-- #anchor: doc_linter
 -- A linter that warns about definitions without docstrings
 -- (simplified)
 def docLinter (declName : Name) : MetaM (Option String) := do
@@ -132,13 +104,6 @@ def docLinter (declName : Name) : MetaM (Option String) := do
   match docStr with
   | some _ => return none
   | none => return some s!"Missing docstring for {declName}"
-```
+-- #end
 
-## Exercises
-
-1. Write a tactic that solves `True` goals
-2. Write a tactic that tries multiple closers: rfl, trivial, simp
-3. Write a macro for `assert_type e : T` that checks at elaboration time
-4. Write a custom syntax for state machine definitions
-5. Build a tactic that prints the current goal in a custom format
-6. Write an elaborator that generates boilerplate code from a spec
+end Course0030Examples

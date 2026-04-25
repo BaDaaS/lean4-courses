@@ -9,7 +9,7 @@ resolution, and unification. Debug elaboration failures.
 
 When Lean encounters an unknown, it creates a metavariable:
 
-```lean
+```lean fromFile:Examples.lean#metavariables
 -- When you write:
 def f := List.map (. + 1) [1, 2, 3]
 
@@ -41,7 +41,7 @@ Unification finds assignments for metavariables that make types match:
 
 ## Implicit Argument Resolution
 
-```lean
+```lean fromFile:Examples.lean#implicit_argument_resolution
 -- @ shows all implicit arguments
 #check @List.map  -- {alpha beta : Type} -> (alpha -> beta) -> List alpha -> List beta
 
@@ -67,21 +67,21 @@ Unification finds assignments for metavariables that make types match:
 
 ## Coercions
 
-```lean
+```lean fromFile:Examples.lean#coercions
 -- Lean inserts coercions automatically:
-def f (n : Int) : Int := n + 1
-#check f (3 : Nat)  -- Works! Lean inserts Nat -> Int coercion
+def g (n : Int) : Int := n + 1
+#check g (3 : Nat)  -- Works! Lean inserts Nat -> Int coercion
 ```
 
 ## Debugging Elaboration
 
-```lean
+```lean fromFile:Examples.lean#debugging_elaboration
 -- Show what Lean elaborated
 set_option pp.all true in
 #check List.map (. + 1) [1, 2, 3]
 
--- Show implicit arguments
-set_option pp.implicit true in
+-- Show implicit arguments (pp.explicit shows all implicit args)
+set_option pp.explicit true in
 #check List.map (. + 1) [1, 2, 3]
 
 -- Show universe levels

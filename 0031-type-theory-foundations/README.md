@@ -27,7 +27,7 @@ Prop : Type 0 : Type 1 : Type 2 : ...
 
 ### Universe Polymorphism
 
-```lean
+```lean fromFile:Examples.lean#universe_polymorphism
 -- Lean automatically infers universe levels
 universe u v
 
@@ -37,7 +37,7 @@ def myId {alpha : Type u} (x : alpha) : alpha := x
 
 ### Impredicativity of Prop
 
-```lean
+```lean fromFile:Examples.lean#impredicativity_of_prop
 -- This lives in Prop, not Type 1:
 #check forall (P : Prop), P -> P  -- Prop
 
@@ -47,7 +47,7 @@ def myId {alpha : Type u} (x : alpha) : alpha := x
 
 ## Pi Types (Dependent Functions)
 
-```lean
+```lean fromFile:Examples.lean#pi_types
 -- Non-dependent: A -> B is sugar for (x : A) -> B (where B ignores x)
 -- Dependent: the return type depends on the argument
 
@@ -57,18 +57,18 @@ def boolToType : Bool -> Type
   | false => String
 
 def dependentFn : (b : Bool) -> boolToType b
-  | true => 42
+  | true => (42 : Nat)
   | false => "hello"
 ```
 
 ## Sigma Types (Dependent Pairs)
 
-```lean
+```lean fromFile:Examples.lean#sigma_types
 -- Non-dependent: A x B
--- Dependent: (x : A) x B x
+-- Dependent: { x : A // B x }
 
 -- A number with a proof it is positive
-def posPair : (n : Nat) x (n > 0) := ⟨5, by omega⟩
+def posPair : { n : Nat // n > 0 } := ⟨5, by omega⟩
 ```
 
 ## Inductive Types and Recursors
@@ -87,7 +87,7 @@ Every `inductive` generates a recursor:
 
 ## Definitional vs Propositional Equality
 
-```lean
+```lean fromFile:Examples.lean#definitional_vs_propositional
 -- Definitional equality: checked by the kernel, no proof needed
 -- 2 + 2 and 4 are definitionally equal
 example : 2 + 2 = 4 := rfl
@@ -102,7 +102,7 @@ example (n : Nat) : n + 0 = n := by simp
 
 In Prop, all proofs of the same proposition are considered equal:
 
-```lean
+```lean fromFile:Examples.lean#proof_irrelevance
 -- If h1 h2 : P, then h1 = h2 (definitionally in Prop)
 theorem proof_irrel (P : Prop) (h1 h2 : P) : h1 = h2 := rfl
 ```
@@ -125,7 +125,10 @@ everything.
 
 You can avoid Classical.choice for constructive mathematics:
 
-```lean
+```lean fromFile:Examples.lean#axiom_free
+-- A simple constructive theorem (uses no axioms)
+theorem myTheorem : 1 + 1 = 2 := rfl
+
 -- Check which axioms a theorem uses:
 #print axioms myTheorem
 -- If empty, the theorem is fully constructive

@@ -10,7 +10,7 @@ propositions can be computed and how finite types enable enumeration.
 A proposition P is `Decidable` if we can algorithmically determine
 whether it is true or false:
 
-```lean
+```lean fromFile:Examples.lean#decidable_propositions
 -- Decidable is defined as:
 -- inductive Decidable (p : Prop) where
 --   | isFalse (h : Not p) : Decidable p
@@ -34,7 +34,7 @@ whether it is true or false:
 
 ## DecidableEq
 
-```lean
+```lean fromFile:Examples.lean#decidable_eq
 -- DecidableEq alpha means equality on alpha is decidable
 -- Most concrete types have this: Nat, Int, String, Bool, etc.
 
@@ -45,7 +45,7 @@ instance : DecidableEq Bool := inferInstance
 
 `Fin n` is the type of natural numbers less than n:
 
-```lean
+```lean fromFile:Examples.lean#fin_n
 -- Fin 3 has exactly three values
 def f0 : Fin 3 := 0
 def f1 : Fin 3 := 1

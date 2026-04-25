@@ -49,7 +49,7 @@ grep -r "^class Field" $MATHLIB/Mathlib/
 
 ### 3. Define Cryptographic Abstractions
 
-```lean
+```lean fromFile:Examples.lean#commitment_scheme
 -- Example: commitment scheme
 structure CommitmentScheme where
   Message : Type
@@ -61,7 +61,7 @@ structure CommitmentScheme where
 
 ### 4. State Security Properties
 
-```lean
+```lean fromFile:Examples.lean#is_binding
 -- Binding: cannot open to two different messages
 def isBinding (cs : CommitmentScheme) : Prop :=
   forall m1 m2 o1 o2 c,

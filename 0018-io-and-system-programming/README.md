@@ -7,7 +7,7 @@ variables, process execution, and command-line interaction.
 
 ## IO Basics
 
-```lean
+```lean fromFile:Examples.lean#io_basics
 def main : IO Unit := do
   IO.println "What is your name?"
   let stdin <- IO.getStdin
@@ -17,7 +17,7 @@ def main : IO Unit := do
 
 ## File IO
 
-```lean
+```lean fromFile:Examples.lean#file_io
 -- Reading a file
 def readFile (path : String) : IO String := do
   IO.FS.readFile path
@@ -34,7 +34,7 @@ def appendFile (path : String) (content : String) : IO Unit := do
 
 ## Environment Variables
 
-```lean
+```lean fromFile:Examples.lean#env_variables
 def getEnvOrDefault (key default : String) : IO String := do
   let val <- IO.getEnv key
   return val.getD default
@@ -42,7 +42,7 @@ def getEnvOrDefault (key default : String) : IO String := do
 
 ## Process Execution
 
-```lean
+```lean fromFile:Examples.lean#process_execution
 def runCommand (cmd : String) (args : Array String) : IO String := do
   let output <- IO.Process.output {
     cmd := cmd
@@ -55,7 +55,7 @@ def runCommand (cmd : String) (args : Array String) : IO String := do
 
 ## Error Handling in IO
 
-```lean
+```lean fromFile:Examples.lean#error_handling
 def safeReadFile (path : String) : IO (Except String String) := do
   try
     let content <- IO.FS.readFile path

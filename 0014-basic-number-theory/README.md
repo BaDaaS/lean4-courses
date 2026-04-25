@@ -16,7 +16,7 @@ example : 3 | 12 := ⟨4, rfl⟩
 
 ## Modular Arithmetic
 
-```lean
+```lean fromFile:Examples.lean#modular_arithmetic
 #eval 17 % 5    -- 2
 #eval 10 % 3    -- 1
 
@@ -35,10 +35,10 @@ example : 3 | 12 := ⟨4, rfl⟩
 
 ## Primality
 
-```lean
+```lean fromFile:Examples.lean#is_prime
 -- A number is prime if it is > 1 and has no divisors other than 1 and itself
 def isPrime (n : Nat) : Prop :=
-  n > 1 /\ forall m, m | n -> m = 1 \/ m = n
+  n > 1 /\ forall m, Dvd.dvd m n -> m = 1 \/ m = n
 ```
 
 ## Math Track

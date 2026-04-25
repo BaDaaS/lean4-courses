@@ -51,7 +51,7 @@ Every file must:
 
 All declarations must be under `Cslib.*`:
 
-```lean
+```lean fromFile:Examples.lean#cslib_namespace
 namespace Cslib.Foundations.MyModule
 -- definitions here
 end Cslib.Foundations.MyModule

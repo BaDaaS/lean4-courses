@@ -7,7 +7,7 @@ handles parallelism in a pure functional setting.
 
 ## Tasks (Lightweight Threads)
 
-```lean
+```lean fromFile:Examples.lean#spawn_task
 -- Spawn a task
 def main : IO Unit := do
   let task <- IO.asTask (prio := .default) do
@@ -20,11 +20,15 @@ def main : IO Unit := do
 
 ## Parallel Map
 
-```lean
-def parallelMap (f : alpha -> IO beta) (xs : Array alpha) :
-    IO (Array beta) := do
-  let tasks <- xs.mapM (IO.asTask . f)
-  tasks.mapM IO.wait
+```lean fromFile:Examples.lean#parallel_map
+def parallelMap {alpha beta : Type} (f : alpha -> IO beta)
+    (xs : Array alpha) : IO (Array beta) := do
+  let tasks <- xs.mapM fun x => IO.asTask (f x)
+  tasks.mapM fun t => do
+    let result <- IO.wait t
+    match result with
+    | .ok v => pure v
+    | .error e => throw e
 ```
 
 ## BaseIO vs IO
@@ -58,7 +62,7 @@ def counterExample : IO Unit := do
 
 ## IO.Ref (Mutable References)
 
-```lean
+```lean fromFile:Examples.lean#io_ref
 def refExample : IO Unit := do
   let ref <- IO.mkRef (0 : Nat)
   ref.modify (. + 1)

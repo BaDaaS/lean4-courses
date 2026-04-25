@@ -11,7 +11,7 @@ The induction principle for Nat:
 - Base case: prove P(0)
 - Inductive step: assume P(n), prove P(n+1)
 
-```lean
+```lean fromFile:Examples.lean#add_zero_induction
 theorem add_zero (n : Nat) : n + 0 = n := by
   induction n with
   | zero => rfl
@@ -31,7 +31,7 @@ theorem add_zero (n : Nat) : n + 0 = n := by
 
 ## Proof by Induction in Tactic Mode
 
-```lean
+```lean fromFile:Examples.lean#zero_add_induction
 theorem zero_add (n : Nat) : 0 + n = n := by
   induction n with
   | zero => rfl

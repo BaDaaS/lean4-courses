@@ -1,13 +1,12 @@
-# 0022 - File IO and CLI Tools
+/-
+# 0023 - File IO and CLI Examples
 
-## Goal
+Code examples from the README, wrapped in anchors for injection.
+-/
 
-Build production-quality CLI tools. Argument parsing, streaming IO,
-directory traversal, and structured error handling.
+namespace Course0023Examples
 
-## Argument Parsing
-
-```lean fromFile:Examples.lean#argument_parsing
+-- #anchor: argument_parsing
 structure Args where
   verbose : Bool := false
   output : Option String := none
@@ -29,13 +28,9 @@ def parseArgs (args : List String) : Except String Args := do
       rest := tail
     | [] => break
   return result
-```
+-- #end
 
-## Streaming File Processing
-
-For large files, process line by line instead of reading everything:
-
-```lean fromFile:Examples.lean#streaming_file_processing
+-- #anchor: streaming_file_processing
 def processLines (path : String) (f : String -> IO Unit) :
     IO Unit := do
   let handle <- IO.FS.Handle.mk path .read
@@ -46,11 +41,9 @@ def processLines (path : String) (f : String -> IO Unit) :
       done := true
     else
       f line.trimAsciiEnd.toString
-```
+-- #end
 
-## Directory Traversal
-
-```lean fromFile:Examples.lean#directory_traversal
+-- #anchor: directory_traversal
 partial def walkDir (path : System.FilePath) :
     IO (Array System.FilePath) := do
   let mut result := #[]
@@ -62,11 +55,9 @@ partial def walkDir (path : System.FilePath) :
     else
       result := result.push entry.path
   return result
-```
+-- #end
 
-## Structured Exit Codes
-
-```lean fromFile:Examples.lean#structured_exit_codes
+-- #anchor: structured_exit_codes
 def mainWithExitCode (args : List String) : IO UInt32 := do
   match parseArgs args with
   | .error msg =>
@@ -78,12 +69,12 @@ def mainWithExitCode (args : List String) : IO UInt32 := do
 
 def main (args : List String) : IO UInt32 :=
   mainWithExitCode args
-```
+-- #end
 
-## Colored Output
-
-```lean fromFile:Examples.lean#colored_output
+-- #anchor: colored_output
 def red (s : String) : String := s!"\x1b[31m{s}\x1b[0m"
 def green (s : String) : String := s!"\x1b[32m{s}\x1b[0m"
 def bold (s : String) : String := s!"\x1b[1m{s}\x1b[0m"
-```
+-- #end
+
+end Course0023Examples
