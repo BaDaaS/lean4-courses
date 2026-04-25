@@ -8,7 +8,7 @@ Learn the formal judgment notation that underpins type checking.
 
 ## Basic Types
 
-```lean
+```lean fromFile:Examples.lean#basic_types
 #check Nat           -- Type
 #check Int           -- Type
 #check Bool          -- Type
@@ -79,7 +79,7 @@ Two terms are **definitionally equal** (written `t =_def s`) if the
 kernel can reduce them to the same normal form by computation. This
 is checked automatically and silently. For example:
 
-```lean
+```lean fromFile:Examples.lean#definitional_equality
 -- The kernel reduces both sides to 4, so rfl works
 example : 2 + 2 = 4 := rfl
 ```
@@ -103,7 +103,7 @@ which requires a proof term.
 Every type itself has a type. Lean organizes types into an infinite
 hierarchy to avoid Russell's paradox:
 
-```lean
+```lean fromFile:Examples.lean#type_universes
 #check Nat           -- Nat : Type
 #check Type          -- Type : Type 1
 #check Type 1        -- Type 1 : Type 2
@@ -134,10 +134,10 @@ you rarely need to think about universe levels explicitly.
 When you write a definition that should work at any universe level,
 Lean uses **universe variables**:
 
-```lean
+```lean fromFile:Examples.lean#universe_polymorphism
 universe u v
 def Prod' (alpha : Type u) (beta : Type v) :=
-  alpha x beta
+  Prod alpha beta
 -- Prod' : Type u -> Type v -> Type (max u v)
 ```
 
@@ -150,7 +150,7 @@ be large enough to contain both components.
 proposition can quantify over all propositions, including itself,
 without moving up a universe level.
 
-```lean
+```lean fromFile:Examples.lean#prop_impredicative
 -- This lives in Prop, not Type 1
 #check forall (P : Prop), P -> P    -- Prop
 ```
@@ -170,7 +170,7 @@ inconsistent and why `Prop : Type` with proof irrelevance is safe.
 
 ## Function Types
 
-```lean
+```lean fromFile:Examples.lean#function_types
 #check Nat -> Nat          -- function from Nat to Nat
 #check Nat -> Bool         -- predicate on Nat
 #check Nat -> Nat -> Nat   -- curried two-argument function
@@ -185,13 +185,13 @@ In dependent type theory, `A -> B` is sugar for the **Pi type**
 `(x : A) -> B` where `B` does not mention `x`. When `B` does
 mention `x`, you have a dependent function type:
 
-```lean
+```lean fromFile:Examples.lean#dependent_function_types
 -- Non-dependent: return type is always Bool
-def isEven : Nat -> Bool := ...
+def isEven : Nat -> Bool := fun n => n % 2 == 0
 
 -- Dependent: return type depends on the input
-def Vec (alpha : Type) (n : Nat) : Type := ...
-def head : (n : Nat) -> Vec alpha (n + 1) -> alpha := ...
+def Vec (alpha : Type) (n : Nat) : Type := Fin n -> alpha
+def head (alpha : Type) (n : Nat) (v : Vec alpha (n + 1)) : alpha := v ⟨0, Nat.zero_lt_succ n⟩
 ```
 
 The Pi type `(x : A) -> B x` is the fundamental type former in
@@ -201,9 +201,9 @@ sum types, even `Nat`) are defined as inductive types on top of it
 
 ## Product and Sum Types
 
-```lean
+```lean fromFile:Examples.lean#product_and_sum_types
 -- Product (pair): both components
-#check Nat x Bool          -- Nat x Bool : Type
+#check Prod Nat Bool        -- Nat x Bool : Type
 #check (3, true)            -- (3, true) : Nat x Bool
 
 -- Sum (either): one of two options
@@ -233,15 +233,16 @@ types** (dependent pairs). A Sigma type `(x : A) x B x` is a pair
 where the type of the second component depends on the value of the
 first:
 
-```lean
+```lean fromFile:Examples.lean#sigma_types
 -- Non-dependent pair
 #check (3, true)          -- Nat x Bool
 
 -- Dependent pair (Sigma type)
 -- A natural number n together with a proof that n > 0
-#check (Sigma (n : Nat) (n > 0))
--- Equivalent shorthand:
--- { n : Nat // n > 0 }    (subtype notation)
+-- PSigma works when the second component is a Prop
+#check PSigma (fun n : Nat => n > 0)
+-- Subtype notation (same idea, but as a Type):
+#check { n : Nat // n > 0 }
 ```
 
 Under Curry-Howard, Sigma types correspond to the existential
@@ -286,7 +287,7 @@ Types specify what data looks like and what functions accept/return.
 Lean's type checker ensures your program respects these
 specifications at compile time.
 
-```lean
+```lean fromFile:Examples.lean#types_as_specifications
 -- The type tells you exactly what this function does
 def increment (n : Nat) : Nat := n + 1
 
@@ -313,7 +314,7 @@ established the progress + preservation framework.
 
 ## Type Annotations
 
-```lean
+```lean fromFile:Examples.lean#type_annotations
 -- Explicit annotation
 def x : Nat := 42
 
@@ -338,7 +339,7 @@ This is critical in Lean:
 - `Prop` is the universe of propositions (logical, may not be
   computable)
 
-```lean
+```lean fromFile:Examples.lean#prop_vs_bool
 #check (5 < 10 : Prop)      -- a proposition
 #check (decide (5 < 10))     -- computable decision
 #eval decide (5 < 10)        -- true

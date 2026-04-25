@@ -12,27 +12,27 @@ package lean4courses where
 @[default_target]
 lean_lib Course0000 where
   srcDir := "0000-startup"
-  roots := #[`Solutions]
+  roots := #[`Solutions, `Examples]
 
 lean_lib Course0001 where
   srcDir := "0001-types"
-  roots := #[`Solutions]
+  roots := #[`Solutions, `Examples]
 
 lean_lib Course0002 where
   srcDir := "0002-functions"
-  roots := #[`Solutions]
+  roots := #[`Solutions, `Examples]
 
 lean_lib Course0003 where
   srcDir := "0003-propositions-and-proofs"
-  roots := #[`Solutions]
+  roots := #[`Solutions, `Examples]
 
 lean_lib Course0004 where
   srcDir := "0004-tactics"
-  roots := #[`Solutions]
+  roots := #[`Solutions, `Examples]
 
 lean_lib Course0005 where
   srcDir := "0005-inductive-types"
-  roots := #[`Solutions]
+  roots := #[`Solutions, `Examples]
 
 lean_lib Course0006 where
   srcDir := "0006-structures-and-typeclasses"

@@ -34,7 +34,7 @@ the STLC (see course 0005 for the full lambda cube).
 
 ## Defining Functions
 
-```lean
+```lean fromFile:Examples.lean#defining_functions
 -- Named definition
 def add (a b : Nat) : Nat := a + b
 
@@ -65,7 +65,7 @@ argument into the body.
 
 In Lean terms:
 
-```lean
+```lean fromFile:Examples.lean#beta_reduction
 -- (fun x => x + 1) 3   computes to   3 + 1   computes to   4
 #eval (fun x => x + 1) 3    -- 4
 ```
@@ -80,7 +80,7 @@ both sides and checks they are identical.
 behave identically on every input. In Lean, eta equality holds
 definitionally for functions:
 
-```lean
+```lean fromFile:Examples.lean#eta_reduction
 -- These are definitionally equal
 example : (fun x => Nat.succ x) = Nat.succ := rfl
 ```
@@ -111,7 +111,7 @@ of conversion." Transactions of the AMS.
 All functions in Lean are curried. A function taking two arguments
 is actually a function returning a function:
 
-```lean
+```lean fromFile:Examples.lean#currying_partial_application
 -- These are the same type:
 -- Nat -> Nat -> Nat
 -- Nat -> (Nat -> Nat)
@@ -144,7 +144,7 @@ directions.
 
 Arguments in `{}` are inferred by Lean:
 
-```lean
+```lean fromFile:Examples.lean#list_length
 def listLength {alpha : Type} (xs : List alpha) : Nat :=
   match xs with
   | [] => 0
@@ -155,7 +155,7 @@ def listLength {alpha : Type} (xs : List alpha) : Nat :=
 
 Use `@` to pass implicit arguments explicitly:
 
-```lean
+```lean fromFile:Examples.lean#list_length_explicit
 #eval @listLength Nat [1, 2, 3]
 ```
 
@@ -207,7 +207,7 @@ dependent types.
 
 ## Where Clauses
 
-```lean
+```lean fromFile:Examples.lean#where_clause
 def hypotenuse (a b : Float) : Float :=
   Float.sqrt (sq a + sq b)
 where
@@ -217,7 +217,7 @@ where
 `where` binds local definitions that are in scope only within the
 body. This is syntactic sugar for `let`:
 
-```lean
+```lean fromFile:Examples.lean#let_clause
 def hypotenuse' (a b : Float) : Float :=
   let sq (x : Float) := x * x
   Float.sqrt (sq a + sq b)
@@ -233,9 +233,9 @@ A **higher-order function** takes a function as an argument or
 returns one. This is the main source of abstraction power in
 functional programming.
 
-```lean
+```lean fromFile:Examples.lean#higher_order_functions
 -- Takes a function as argument
-def applyTwice (f : alpha -> alpha) (x : alpha) : alpha :=
+def applyTwice {alpha : Type} (f : alpha -> alpha) (x : alpha) : alpha :=
   f (f x)
 
 #eval applyTwice (fun n : Nat => n + 1) 0  -- 2

@@ -335,7 +335,7 @@ axiomatization of intuitionistic logic.
 
 Since proofs are just terms, you could write:
 
-```lean
+```lean fromFile:Examples.lean#theorem_vs_def
 def my_proof : 1 + 1 = 2 := rfl
 ```
 

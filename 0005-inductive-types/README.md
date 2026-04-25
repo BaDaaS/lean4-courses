@@ -86,9 +86,9 @@ When you write `(alpha : Type)`, this means `alpha : Type 0`, and
 the whole function lives in `Type 1`. The `universe` command lets
 you be polymorphic over universe levels:
 
-```lean
+```lean fromFile:Examples.lean#universe_polymorphic_id
 universe u
-def id' {alpha : Type u} (x : alpha) : alpha := x
+def myId' {alpha : Type u} (x : alpha) : alpha := x
 ```
 
 ## The Lambda Cube and Where Lean Sits
@@ -263,7 +263,7 @@ The exercises progress through the lambda cube:
 
 ### Enumeration
 
-```lean
+```lean fromFile:Examples.lean#weekday_enum
 inductive Weekday where
   | monday | tuesday | wednesday | thursday
   | friday | saturday | sunday
@@ -276,7 +276,7 @@ The STLC can express this.
 
 ### With data (like enums with payloads)
 
-```lean
+```lean fromFile:Examples.lean#shape_with_data
 inductive Shape where
   | circle (radius : Float)
   | rectangle (width : Float) (height : Float)
@@ -291,7 +291,7 @@ type" in ML/Haskell: the type is built from sums (+) and products
 
 ### Recursive types
 
-```lean
+```lean fromFile:Examples.lean#mynat_recursive
 inductive MyNat where
   | zero : MyNat
   | succ (n : MyNat) : MyNat
@@ -306,7 +306,7 @@ the finite natural numbers (not infinite streams).
 
 ## How Lean's Nat Works
 
-```lean
+```lean fromFile:Examples.lean#nat_encoding_comment
 -- Nat is defined as:
 -- inductive Nat where
 --   | zero : Nat
@@ -321,7 +321,7 @@ every natural number is either zero or the successor of another.
 
 ## Pattern Matching on Inductive Types
 
-```lean
+```lean fromFile:Examples.lean#pattern_matching_weekday_shape
 def weekdayToString : Weekday -> String
   | .monday    => "Monday"
   | .tuesday   => "Tuesday"
@@ -332,7 +332,7 @@ def weekdayToString : Weekday -> String
   | .sunday    => "Sunday"
 
 def area : Shape -> Float
-  | .circle r       => Float.pi * r * r
+  | .circle r       => 3.14159265358979 * r * r
   | .rectangle w h  => w * h
   | .triangle b h   => 0.5 * b * h
 ```
@@ -362,7 +362,7 @@ eliminator. Pattern matching compiles down to calls to this recursor.
 
 ## Recursive Functions on Inductive Types
 
-```lean
+```lean fromFile:Examples.lean#myadd_recursive
 def myAdd : MyNat -> MyNat -> MyNat
   | .zero,   m => m
   | .succ n, m => .succ (myAdd n m)
@@ -376,12 +376,12 @@ guarantees termination by well-founded induction on the structure of
 
 ## Parameterized Inductive Types
 
-```lean
+```lean fromFile:Examples.lean#mylist_parameterized
 inductive MyList (alpha : Type) where
   | nil : MyList alpha
   | cons (head : alpha) (tail : MyList alpha) : MyList alpha
 
-def myLength : MyList alpha -> Nat
+def myLength {alpha : Type} : MyList alpha -> Nat
   | .nil => 0
   | .cons _ tail => 1 + myLength tail
 ```
@@ -413,10 +413,10 @@ Every inductive type comes with two operations:
 
 **Introduction**: the data constructors. They build values.
 
-```lean
+```lean fromFile:Examples.lean#maybe_introduction
 -- Introducing a Maybe value
-Maybe.just 42      -- : Maybe Nat
-Maybe.nothing      -- : Maybe Nat
+#check (Maybe.just 42)    -- : Maybe Nat
+#check (@Maybe.nothing Nat)  -- : Maybe Nat
 ```
 
 **Elimination**: pattern matching (or the recursor). It takes apart
@@ -471,10 +471,10 @@ This is the essence of **dependently typed programming**: encoding
 invariants in the type. The classic example is `Vector n`, a list
 whose length is part of its type:
 
-```lean
+```lean fromFile:Examples.lean#vector_indexed
 inductive Vector (alpha : Type) : Nat -> Type where
   | nil  : Vector alpha 0
-  | cons : alpha -> Vector alpha n -> Vector alpha (n + 1)
+  | cons : {n : Nat} -> alpha -> Vector alpha n -> Vector alpha (n + 1)
 ```
 
 Here `alpha` is a parameter (uniform across constructors) and `Nat`
@@ -516,7 +516,7 @@ They combine **sum types** (multiple constructors) with **product
 types** (constructor arguments). Pattern matching provides
 exhaustive case analysis.
 
-```lean
+```lean fromFile:Examples.lean#myoption_adt
 -- Like Haskell's: data Maybe a = Nothing | Just a
 inductive MyOption (alpha : Type) where
   | none : MyOption alpha

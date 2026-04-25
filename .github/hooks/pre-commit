@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Pre-commit hook: inject .lean snippets into staged READMEs.
+# Install: git config core.hooksPath .github/hooks
+set -euo pipefail
+
+# Find staged .md files
+staged_md=()
+while IFS= read -r f; do
+    [[ -n "$f" ]] && staged_md+=("$f")
+done < <(
+    git diff --cached --name-only --diff-filter=ACM \
+        | grep '\.md$' || true
+)
+
+if [[ ${#staged_md[@]} -eq 0 ]]; then
+    exit 0
+fi
+
+# Run injection on staged markdown files
+script_dir="$(git rev-parse --show-toplevel)/.github/scripts"
+
+if [[ ! -x "$script_dir/inject-snippets.sh" ]]; then
+    exit 0
+fi
+
+"$script_dir/inject-snippets.sh" "${staged_md[@]}"
+
+# Re-stage any files that changed
+for f in "${staged_md[@]}"; do
+    git add "$f"
+done

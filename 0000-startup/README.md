@@ -28,7 +28,7 @@ lean --version
 
 Create a file `Hello.lean`:
 
-```lean
+```lean fromFile:Examples.lean#first_lean_file
 -- This is a comment
 #check 42          -- Nat
 #check "hello"     -- String
@@ -64,7 +64,7 @@ The primary way to define a named function or value. The body is
 **compiled** into executable code (Lean IR, then C). The definition
 is **reducible**: other code can unfold it.
 
-```lean
+```lean fromFile:Examples.lean#def_double
 def double (n : Nat) : Nat := 2 * n
 #eval double 5  -- 10 (runs compiled code)
 ```
@@ -76,7 +76,7 @@ proof) is **erased** at compile time and **not** compiled into
 executable code. You cannot `#eval` a theorem or use it in a
 computation.
 
-```lean
+```lean fromFile:Examples.lean#theorem_two_eq
 theorem two_eq : 1 + 1 = 2 := rfl
 -- #eval two_eq  -- ERROR: not executable
 ```
@@ -97,7 +97,7 @@ An **anonymous** def/theorem. Lean type-checks it and then
 immediately discards it. It has no name and no lasting effect on
 the environment. Useful for testing and exercises.
 
-```lean
+```lean fromFile:Examples.lean#example_declarations
 example : 1 + 1 = 2 := rfl          -- checked, then forgotten
 example (n : Nat) : Nat := n + 1    -- also fine
 ```
@@ -124,7 +124,7 @@ A declaration with a body that the kernel **cannot unfold**. The
 body exists (the value is well-defined), but nothing can look
 inside it. Used for FFI bindings and performance isolation.
 
-```lean
+```lean fromFile:Examples.lean#opaque_secret_value
 opaque secretValue : Nat := 42
 -- The kernel cannot see that secretValue = 42
 ```
@@ -135,7 +135,7 @@ A `def` that is not compiled. Used when the definition depends on
 classical axioms or other non-constructive principles that have no
 computational content.
 
-```lean
+```lean fromFile:Examples.lean#noncomputable_classical_choice
 noncomputable def classicalChoice (P : Prop) [h : Decidable P] :
     Bool := if P then true else false
 ```
@@ -146,7 +146,7 @@ Postulates a term without providing a body. This extends Lean's
 logic with a new assumption. Dangerous: inconsistent axioms make
 the logic unsound.
 
-```lean
+```lean fromFile:Examples.lean#axiom_my_axiom
 axiom myAxiom : forall (n : Nat), n + 0 = n
 -- No proof needed, but no guarantee of consistency
 ```
@@ -248,11 +248,9 @@ fully explicit **core term** that the kernel can check independently.
 
 You can see the core term with `#print`:
 
-```lean
+```lean fromFile:Examples.lean#def_double
 def double (n : Nat) : Nat := 2 * n
-#print double
--- def double : Nat -> Nat :=
--- fun n => 2 * n
+#eval double 5  -- 10 (runs compiled code)
 ```
 
 ### Three axioms, and what they mean
@@ -292,7 +290,7 @@ Lean is a language where you can state mathematical theorems as types
 and provide proofs as terms. The type checker verifies your proofs
 are correct.
 
-```lean
+```lean fromFile:Examples.lean#theorem_one_plus_one
 -- A theorem is a type (the statement) with a term (the proof)
 theorem one_plus_one : 1 + 1 = 2 := rfl
 ```
@@ -312,7 +310,7 @@ Lean is a pure functional language with dependent types. It compiles
 to C via an intermediate representation and can be used for real
 software, not just proofs.
 
-```lean
+```lean fromFile:Examples.lean#factorial_def
 def factorial : Nat -> Nat
   | 0 => 1
   | n + 1 => (n + 1) * factorial n
